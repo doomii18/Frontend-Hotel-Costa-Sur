@@ -42,7 +42,15 @@ function setReservas(reservas) { localStorage.setItem('reservas', JSON.stringify
 
 function registrarUsuario(datos) {
   const usuarios = getUsuarios();
-  if (usuarios.find(u => u.email === datos.email)) { alert("⚠️ Este correo ya está registrado."); return false; }
+  // Validar que la contraseña tenga al menos 8 caracteres
+  if (datos.password.length < 8) {
+    alert("❌ La contraseña debe tener al menos 8 caracteres.");
+    return false;
+  }
+  if (usuarios.find(u => u.email === datos.email)) { 
+    alert("⚠️ Este correo ya está registrado."); 
+    return false; 
+  }
   const nuevoUsuario = { id: Date.now(), ...datos, fechaRegistro: new Date().toISOString() };
   usuarios.push(nuevoUsuario);
   setUsuarios(usuarios);
@@ -61,13 +69,29 @@ function loginUsuario(nombre, password) {
   } else { alert("❌ Usuario o contraseña incorrectos."); return false; }
 }
 
-function logoutUsuario() { setUsuarioActual(null); actualizarHeaderUsuario(); alert("👋 Has cerrado sesión."); }
+function logoutUsuario() {
+  if (confirm("¿Estás seguro de que deseas cerrar sesión?")) {
+    setUsuarioActual(null);
+    actualizarHeaderUsuario();
+    alert("👋 Has cerrado sesión.");
+  }
+}
+
 function actualizarHeaderUsuario() {
   const usuario = getUsuarioActual();
   const userNameSpan = document.getElementById('userNameDisplay');
   const logoutBtn = document.getElementById('logoutBtn');
-  if (usuario) { if (userNameSpan) userNameSpan.textContent = `👤 ${usuario.nombre}`; if (logoutBtn) logoutBtn.style.display = 'block'; }
-  else { if (userNameSpan) userNameSpan.textContent = ''; if (logoutBtn) logoutBtn.style.display = 'none'; }
+  const loginBtn = document.getElementById('abrirLoginBtn');
+  if (usuario) { 
+    if (userNameSpan) userNameSpan.textContent = `👤 ${usuario.nombre}`; 
+    if (logoutBtn) logoutBtn.style.display = 'block'; 
+    if (loginBtn) loginBtn.style.display = 'none';
+  }
+  else { 
+    if (userNameSpan) userNameSpan.textContent = ''; 
+    if (logoutBtn) logoutBtn.style.display = 'none'; 
+    if (loginBtn) loginBtn.style.display = 'inline-block';
+  }
 }
 
 function calcularDias(fechaIngreso, fechaSalida) {
@@ -88,6 +112,32 @@ function crearReserva(reservaData) {
   return true;
 }
 
+// Cancelar reserva
+function cancelarReserva(reservaId) {
+  if (!confirm("¿Estás seguro de que deseas cancelar esta reserva?")) return;
+  
+  let reservas = getReservas();
+  const reserva = reservas.find(r => r.id === reservaId);
+  if (!reserva) {
+    alert("Reserva no encontrada.");
+    return;
+  }
+  
+  const habitacion = habitaciones.find(h => h.id === reserva.habitacionId);
+  if (habitacion) habitacion.disponible = true;
+  
+  reservas = reservas.filter(r => r.id !== reservaId);
+  setReservas(reservas);
+  
+  alert(`Reserva de ${reserva.habitacionNombre} cancelada correctamente.`);
+  
+  const misReservasPopup = document.getElementById('misReservasPopup');
+  if (misReservasPopup && misReservasPopup.style.display === 'flex') {
+    mostrarMisReservas();
+  }
+  renderRooms(currentFilter);
+}
+
 // RENDERIZAR HABITACIONES
 let habitacionSeleccionada = null;
 let currentFilter = "all";
@@ -102,21 +152,42 @@ function renderRooms(filter = "all") {
   if (filtered.length === 0) { container.innerHTML = '<div style="text-align:center; padding:3rem;">🚫 No hay habitaciones en esta categoría</div>'; return; }
   container.innerHTML = filtered.map(room => {
     let extra = [];
-    if (room.televisor) extra.push("📺 TV");
-    if (room.aire) extra.push("❄️ Aire Acondicionado");
-    else extra.push("💨 Ventilador");
+    if (room.televisor) extra.push("TV");
+    if (room.aire) extra.push("Aire Acondicionado");
+    else extra.push("Ventilador");
+    let img = "IMG/Hotel Costa Sur.jpeg"; // Imagen por defecto
+    const id = room.id;
+    if ([1, 2, 4, 16].includes(id)) img = "IMG/habitaciones/Habitacion  1,2,4,16.jpeg";
+    else if (id === 19) img = "IMG/habitaciones/Habitación 19.jpeg";
+    else if (id === 21) img = "IMG/habitaciones/Habitación 21 .jpeg";
+    else if ([3, 5, 6, 15, 17, 18].includes(id)) img = "IMG/habitaciones/Habitación 3, 5, 6, 15, 17, 18.jpeg";
+    else if ([7, 8, 22].includes(id)) img = "IMG/habitaciones/Habitación 7, 8, 22.jpeg";
+    else if ([9, 10, 11, 12, 13, 14].includes(id)) img = "IMG/habitaciones/Habitación 9, 10 11, 12, 13, 14.jpeg";
+    else if ([23, 24, 25].includes(id)) img = "IMG/habitaciones/Habitación Aire acondicionado 23, 24, 25.jpeg";
+    
     const allFeatures = [...room.caracteristicas, ...extra];
-    let img = "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400&h=200&fit=crop";
-    if (room.aire) img = "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&h=200&fit=crop";
-    else if (room.televisor) img = "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=400&h=200&fit=crop";
+    
+    const featuresHtml = allFeatures.map(f => {
+      let iconHTML = `<span style="color: #888; margin-right: 4px;">✓</span>`;
+      return `<span class="feature-tag">${iconHTML}${f}</span>`;
+    }).join('');
+
     return `<div class="room-card" data-room-id="${room.id}">
-      <img src="${img}" class="room-card__img">
+      <div class="room-card__img-container">
+        <img src="${img}" class="room-card__img">
+        ${room.disponible ? '<div class="room-badge">✓ Disponible</div>' : '<div class="room-badge" style="background:var(--gris-texto)">✗ Reservado</div>'}
+      </div>
       <div class="room-card__content">
-        <h3 class="room-card__title">${room.nombre} - ${room.tipo}</h3>
-        <div class="room-card__features">${allFeatures.map(f => `<span class="feature-tag">${f}</span>`).join('')}</div>
-        <div class="room-card__price">C$${room.precio}</div>
-        <div class="room-status ${room.disponible ? 'status--available' : 'status--booked'}">${room.disponible ? '✓ Disponible' : '✗ Reservado'}</div>
-        <button class="room-card__btn" onclick="seleccionarHabitacion(${room.id}, '${room.nombre} - ${room.tipo}', ${room.precio})" ${!room.disponible ? 'disabled' : ''}>${room.disponible ? 'Reservar ahora' : 'No disponible'}</button>
+        <h3 class="room-card__title">${room.nombre}</h3>
+        <p class="room-card__subtitle">${room.tipo}</p>
+        <div class="room-card__features">${featuresHtml}</div>
+        
+        <div class="room-card__footer">
+          <div class="room-card__price-new">
+            <strong>C$${room.precio}</strong><span>/noche</span>
+          </div>
+          <button class="room-card__btn-new" onclick="seleccionarHabitacion(${room.id}, '${room.nombre} - ${room.tipo}', ${room.precio})" ${!room.disponible ? 'disabled' : ''}>${room.disponible ? 'Reservar' : 'No disponible'}</button>
+        </div>
       </div>
     </div>`;
   }).join('');
@@ -171,8 +242,21 @@ function mostrarMisReservas() {
   if (!usuario) { alert("Debes iniciar sesión."); mostrarPopup('loginPopup'); return; }
   const reservas = getReservas().filter(r => r.usuarioId === usuario.id);
   const container = document.getElementById('misReservasContent');
-  if (reservas.length === 0) container.innerHTML = '<p style="text-align:center; padding:2rem;">📭 No tienes reservas aún.</p>';
-  else container.innerHTML = reservas.map(r => `<div style="border:1px solid #ddd; margin-bottom:1rem; padding:1rem; border-radius:12px;"><strong>${r.habitacionNombre}</strong><br>Entrada: ${r.fechaIngreso} | Salida: ${r.fechaSalida}<br>Días: ${r.dias} | Total: C$${r.total}<br>Huésped: ${r.nombres} ${r.apellidos}</div>`).join('');
+  if (reservas.length === 0) {
+    container.innerHTML = '<p style="text-align:center; padding:2rem;">📭 No tienes reservas aún.</p>';
+  } else {
+    container.innerHTML = reservas.map(r => `
+      <div style="border:1px solid #ddd; margin-bottom:1rem; padding:1rem; border-radius:12px;">
+        <strong>${r.habitacionNombre}</strong><br>
+        Entrada: ${r.fechaIngreso} | Salida: ${r.fechaSalida}<br>
+        Días: ${r.dias} | Total: C$${r.total}<br>
+        Huésped: ${r.nombres} ${r.apellidos}
+        <div style="margin-top: 0.8rem;">
+          <button class="popup__btn popup__btn--cerrar" style="padding: 0.4rem 1rem; font-size: 0.8rem;" onclick="cancelarReserva(${r.id})">Cancelar reserva</button>
+        </div>
+      </div>
+    `).join('');
+  }
   mostrarPopup('misReservasPopup');
 }
 
@@ -219,10 +303,22 @@ document.addEventListener('DOMContentLoaded', () => {
   // Registro
   document.getElementById('registroForm')?.addEventListener('submit', (e) => {
     e.preventDefault();
-    const datos = { nombre: document.getElementById('regNombre').value.trim(), email: document.getElementById('regEmail').value.trim(), password: document.getElementById('regPassword').value.trim() };
-    if (!datos.nombre || !datos.email || !datos.password) { alert("Completa todos los campos."); return; }
+    const nombre = document.getElementById('regNombre').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPassword').value.trim();
+    
+    if (!nombre || !email || !password) {
+      alert("Completa todos los campos.");
+      return;
+    }
+    if (password.length < 8) {
+      alert("❌ La contraseña debe tener al menos 8 caracteres.");
+      return;
+    }
+    const datos = { nombre, email, password };
     if (registrarUsuario(datos)) cerrarPopup('registroPopup');
   });
+  
   // Login
   document.getElementById('loginForm')?.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -230,6 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const password = document.getElementById('loginPassword').value.trim();
     if (loginUsuario(usuario, password)) cerrarPopup('loginPopup');
   });
+  
   // Reserva
   const reservaForm = document.getElementById('popupForm');
   if (reservaForm) {
@@ -292,9 +389,32 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   document.getElementById('irRegistroLink')?.addEventListener('click', (e) => { e.preventDefault(); cerrarPopup('loginPopup'); mostrarPopup('registroPopup'); });
   document.getElementById('irLoginLink')?.addEventListener('click', (e) => { e.preventDefault(); cerrarPopup('registroPopup'); mostrarPopup('loginPopup'); });
+  document.getElementById('abrirLoginBtn')?.addEventListener('click', (e) => { e.preventDefault(); mostrarPopup('loginPopup'); });
   document.getElementById('heroReservarBtn')?.addEventListener('click', () => { if (!getUsuarioActual()) mostrarPopup('loginPopup'); else alert("Selecciona una habitación para reservar."); });
   document.getElementById('misReservasLink')?.addEventListener('click', (e) => { e.preventDefault(); mostrarMisReservas(); });
   document.getElementById('logoutBtn')?.addEventListener('click', logoutUsuario);
   document.querySelector('.header__title')?.addEventListener('dblclick', mostrarAdmin);
+  
+  // Sorteo / Lead Capture
+  const sorteoForm = document.getElementById('sorteoForm');
+  if (sorteoForm) {
+    sorteoForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const nombres = document.getElementById('sorteoNombres').value.trim();
+      const apellidos = document.getElementById('sorteoApellidos').value.trim();
+      const email = document.getElementById('sorteoEmail').value.trim();
+      const telefono = document.getElementById('sorteoTelefono').value.trim();
+      const departamento = document.getElementById('sorteoDepartamento').value;
+      const sexo = document.getElementById('sorteoSexo').value;
+      const edad = document.getElementById('sorteoEdad').value;
+      const ocupacion = document.getElementById('sorteoOcupacion').value.trim();
+      let leads = JSON.parse(localStorage.getItem('sorteoLeads')) || [];
+      leads.push({ nombres, apellidos, email, telefono, departamento, sexo, edad, ocupacion, fecha: new Date().toISOString() });
+      localStorage.setItem('sorteoLeads', JSON.stringify(leads));
+      alert("🎉 ¡Gracias por participar, " + nombres + "! Ya estás dentro del sorteo mensual. Te contactaremos por correo si resultas ganador.");
+      sorteoForm.reset();
+    });
+  }
+
   setTimeout(() => { if (!getUsuarioActual()) mostrarPopup('loginPopup'); }, 3000);
 });

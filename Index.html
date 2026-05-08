@@ -1,252 +1,443 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hotel Costa Sur - San Carlos, Nicaragua</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="CSS/style.css">
 </head>
+
 <body>
 
-<!-- HEADER -->
-<header class="header">
-  <div class="header__logo">
-    <h1 class="header__title">Hotel Costa Sur</h1>
-  </div>
-  <nav class="header__nav">
-    <a href="#descripcion">Hotel</a>
-    <a href="#habitaciones">Habitaciones</a>
-    <a href="#servicios">Servicios</a>
-    <a href="#resenas">Reseñas</a>
-    <a href="#contacto">Contacto</a>
-    <a href="#" id="misReservasLink">Mis Reservas</a>
-  </nav>
-  <div class="header__user" id="userInfo">
-    <span id="userNameDisplay"></span>
-    <button id="logoutBtn" class="logout-btn" style="display: none;">Cerrar Sesión</button>
-  </div>
-</header>
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header__logo">
+      <img src="IMG/LOGO.jpeg" alt="Hotel Costa Sur" class="header__logo-img">
+    </div>
+    <nav class="header__nav">
+      <a href="#descripcion">Hotel</a>
+      <a href="#habitaciones">Habitaciones</a>
+      <a href="#servicios">Servicios</a>
+      <a href="#resenas">Reseñas</a>
+      <a href="#contacto">Contacto</a>
+      <a href="#" id="misReservasLink">Mis Reservas</a>
+    </nav>
+    <div class="header__user" id="userInfo">
+      <button id="abrirLoginBtn" class="logout-btn" style="background: var(--azul-profundo); color: white;">Iniciar
+        Sesión</button>
+      <span id="userNameDisplay"></span>
+      <button id="logoutBtn" class="logout-btn" style="display: none;">Cerrar Sesión</button>
+    </div>
+  </header>
 
-<!-- HERO -->
-<section class="hero">
-  <img src="IMG/Hotel Costa Sur.jpeg" alt="Hotel Costa Sur" class="hero__img">
-  <div class="hero__content">
-    <h2>Descubre un rincón único en San Carlos</h2>
-    <p>Habitaciones cómodas · Atención 24/7</p>
-    <button class="btn btn--primary" id="heroReservarBtn">Reservar ahora →</button>
-  </div>
-</section>
+  <!-- HERO -->
+  <section class="hero">
+    <img src="IMG/Hotel Costa Sur.jpeg" alt="Hotel Costa Sur" class="hero__img">
+    <div class="hero__container">
+      <div class="hero__content-left">
+        <div class="hero__location">
+          <i class="fas fa-map-marker-alt"></i> San Carlos, Río San Juan, Nicaragua
+        </div>
+        <h2>Descubre un <span class="hero__highlight">rincón</span><br><span class="hero__highlight">único</span> en San
+          Carlos</h2>
+        <p class="hero__subtitle">Más de 27 años de experiencia brindando<br>hospitalidad de calidad. Habitaciones
+          cómodas,<br>atención 24/7 y la mejor ubicación.</p>
+        <div class="hero__buttons">
+          <button class="btn btn--blue" id="heroReservarBtn">Reservar ahora <i class="fas fa-arrow-right"
+              style="margin-left: 5px;"></i></button>
+          <a href="https://wa.me/50588536728" target="_blank" class="btn btn--glass" id="heroWhatsAppBtn" style="text-decoration: none; display: inline-block;">Contactar por WhatsApp</a>
+        </div>
+      </div>
 
-<!-- TARJETAS DE ESTADÍSTICAS -->
-<div class="stats-cards">
-  <div class="stat-card"><span class="stat-number">25</span><span class="stat-label">Habitaciones</span></div>
-  <div class="stat-card"><span class="stat-number">27</span><span class="stat-label">Años de servicio</span></div>
-  <div class="stat-card"><span class="stat-number">24/7</span><span class="stat-label">Atención</span></div>
-</div>
-
-<!-- DESCRIPCIÓN -->
-<section id="descripcion" class="section">
-  <h2 class="section__title">Sobre el Hotel</h2>
-  <div class="about-container">
-    <div class="about-text">
-      <p>El <strong>Hotel Costa Sur</strong>, ubicado frente a la sucursal Banpro en San Carlos, Río San Juan, fue fundado por <strong>Thelma Chamorro</strong> e inaugurado el <strong>23 de marzo de 1999</strong>. Con más de 27 años de experiencia, nos hemos consolidado como una opción confiable de alojamiento en la zona.</p>
-      <p><i class="fas fa-map-marker-alt"></i> <strong>Dirección:</strong> Frente a Banpro, San Carlos, Río San Juan, Nicaragua</p>
-      <div class="info-badges">
-        <span class="info-badge"><i class="far fa-calendar-alt"></i> Fundado 1999</span>
-        <span class="info-badge"><i class="fas fa-star"></i> +27 años de Servicio</span>
+      <div class="hero__content-right">
+        <div class="hero-stats-grid">
+          <div class="hero-stat-card">
+            <span class="stat-number">25</span>
+            <span class="stat-label">Habitaciones disponibles</span>
+          </div>
+          <div class="hero-stat-card">
+            <span class="stat-number">27+</span>
+            <span class="stat-label">Años de servicio</span>
+          </div>
+          <div class="hero-stat-card stat-card-flex">
+            <i class="far fa-clock stat-icon"></i>
+            <div>
+              <span class="stat-number">24/7</span>
+              <span class="stat-label">Atención</span>
+            </div>
+          </div>
+          <div class="hero-stat-card stat-card-flex">
+            <i class="fas fa-star stat-icon"></i>
+            <div>
+              <span class="stat-number">4.8</span>
+              <span class="stat-label">Calificación</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="map">
-      <iframe src="https://maps.google.com/maps?q=Hotel%20Costa%20Sur%20San%20Carlos&t=&z=16&ie=UTF8&iwloc=&output=embed" allowfullscreen></iframe>
-      <a href="#" class="map-link">Ver en Google Maps →</a>
-    </div>
-  </div>
-</section>
+  </section>
 
-<!-- HABITACIONES -->
-<section id="habitaciones" class="section section--gray">
-  <h2 class="section__title">Nuestras Habitaciones</h2>
-  <p style="margin-bottom: 1.5rem;">Selecciona tu favorita y reserva al mejor precio | Disponibilidad en tiempo real</p>
-  <div class="filters">
-    <button class="filter-btn filter-btn--active" data-filter="all">Todas</button>
-    <button class="filter-btn" data-filter="estandar">Económicas (C$400 - C$500)</button>
-    <button class="filter-btn" data-filter="familiares">Familiares (C$550 - C$900)</button>
-    <button class="filter-btn" data-filter="aire">Con Aire Acondicionado (C$1100)</button>
-  </div>
-  <div class="rooms-grid" id="roomsContainer"></div>
-</section>
-
-<!-- SERVICIOS -->
-<section id="servicios" class="section">
-  <h2 class="section__title">🌟 Servicios</h2>
-  <div class="services">
-    <div class="service-card"><h3>🏆 Alojamiento de calidad</h3><p>Habitaciones cómodas y limpias para tu descanso.</p></div>
-    <div class="service-card"><h3>⏰ Atención 24/7</h3><p>Siempre disponibles para ti, día y noche.</p></div>
-    <div class="service-card"><h3>🤝 Servicio amable</h3><p>Trato cálido y personalizado.</p></div>
-    <div class="service-card"><h3>🔒 Ambiente seguro</h3><p>Máxima seguridad durante tu estadía.</p></div>
-  </div>
-</section>
-
-<!-- RESEÑAS -->
-<section id="resenas" class="section section--gray">
-  <h2 class="section__title">⭐ Reseñas de Clientes</h2>
-  <div class="reviews">
-    <div class="review"><p>"Excelente atención, muy limpio y cómodo. Volveré sin dudas."</p><span>⭐⭐⭐⭐⭐</span></div>
-    <div class="review"><p>"Buena ubicación y personal súper amable, precios justos."</p><span>⭐⭐⭐⭐</span></div>
-    <div class="review"><p>"Precio accesible, habitaciones amplias y vista increíble."</p><span>⭐⭐⭐⭐⭐</span></div>
-  </div>
-</section>
-
-<!-- CONTACTO -->
-<section id="contacto" class="section contacto-section">
-  <h2 class="section__title">Contáctanos</h2>
-  <p class="contacto-subtitle">Estamos aquí para ayudarte. Contáctanos por cualquiera de estos medios.</p>
-  <div class="contacto-grid">
-    <div class="contacto-info">
-      <div class="contacto-item">
-        <i class="fas fa-phone-alt"></i>
-        <div><h4>Teléfono</h4><p>+505 8853 6728</p></div>
+  <!-- DESCRIPCIÓN -->
+  <section id="descripcion" class="section">
+    <h2 class="section__title">Sobre el <span class="highlight-cursive-blue">Hotel</span></h2>
+    <div class="about-container-new">
+      <div class="about-left-col">
+        <div class="about-text-card">
+          <p>El <strong style="color: #0056b3;">Hotel Costa Sur</strong>, ubicado frente a la sucursal Banpro en San Carlos, Río San Juan, fue fundado por <strong>Thelma Chamorro</strong> e inaugurado el <strong>23 de marzo de 1999</strong>. Con más de 27 años de experiencia, nos hemos consolidado como una opción confiable de alojamiento en la zona.</p>
+          <div class="about-address">
+            <i class="fas fa-map-marker-alt" style="color: #0056b3; margin-right: 8px;"></i>
+            <strong>Dirección:</strong> Frente a Banpro, San Carlos, Río San Juan, Nicaragua
+          </div>
+          <div class="info-badges-new">
+            <span class="info-badge-new"><i class="far fa-calendar-alt"></i> Fundado 1999</span>
+            <span class="info-badge-new"><i class="fas fa-star"></i> +27 años de Servicio</span>
+          </div>
+        </div>
+        <div class="about-stats-row">
+          <div class="about-stat-box box-blue">
+            <span class="about-stat-val val-blue">C$400</span>
+            <span class="about-stat-lbl">Desde / noche</span>
+          </div>
+          <div class="about-stat-box box-beige">
+            <span class="about-stat-val val-dark">25</span>
+            <span class="about-stat-lbl">Habitaciones disponibles</span>
+          </div>
+        </div>
       </div>
-      <div class="contacto-item">
-        <i class="fas fa-envelope"></i>
-        <div><h4>Email</h4><p>info@hotelcostasur.com</p></div>
-      </div>
-      <div class="contacto-item">
-        <i class="fas fa-map-marker-alt"></i>
-        <div><h4>Dirección</h4><p>Frente a Banpro, San Carlos, Río San Juan, Nicaragua</p></div>
+      <div class="about-right-col">
+        <div class="map-wrapper">
+          <iframe src="https://maps.google.com/maps?q=Hotel%20Costa%20Sur%20San%20Carlos&t=&z=16&ie=UTF8&iwloc=&output=embed" allowfullscreen></iframe>
+          <div class="map-footer">
+            <div class="map-footer-text">
+              <i class="fas fa-map-marker-alt" style="color: #0056b3; margin-right: 8px;"></i>
+              Frente a Banpro, San Carlos
+            </div>
+            <a href="https://maps.google.com/maps?q=Hotel%20Costa%20Sur%20San%20Carlos" target="_blank" class="map-link-new">Ver en Google Maps <i class="fas fa-external-link-alt" style="font-size: 0.8rem;"></i></a>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="contacto-redes">
-      <a href="https://www.facebook.com/hotelcostasur/about" target="_blank" class="red-social"><i class="fab fa-facebook-f"></i> Facebook</a>
-      <a href="https://www.tiktok.com/@hotelcostasur1" target="_blank" class="red-social"><i class="fab fa-tiktok"></i> TikTok</a>
-      <a href="https://wa.me/50588536728" target="_blank" class="red-social"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-    </div>
-  </div>
-</section>
+  </section>
 
-<!-- FOOTER MODERNO -->
-<footer class="footer-modern">
-  <div class="footer-container">
-    <div class="footer-col">
-      <h3>Hotel Costa Sur</h3>
-      <p>San Carlos, Nicaragua</p>
-      <p class="footer-desc">Más de 27 años brindando hospitalidad de calidad en San Carlos, Río San Juan.</p>
+  <!-- HABITACIONES -->
+  <section id="habitaciones" class="section" style="background-color: #FFFFFF;">
+    <h2 class="section__title">Nuestras <span class="highlight-cursive-blue">Habitaciones</span></h2>
+    <p style="margin-bottom: 1.5rem;">Selecciona tu favorita y reserva al mejor precio | Disponibilidad en tiempo real
+    </p>
+    <div class="filters">
+      <button class="filter-btn filter-btn--active" data-filter="all">Todas</button>
+      <button class="filter-btn" data-filter="estandar">Económicas (C$400 - C$500)</button>
+      <button class="filter-btn" data-filter="familiares">Familiares (C$550 - C$900)</button>
+      <button class="filter-btn" data-filter="aire">Con Aire Acondicionado (C$1100)</button>
     </div>
-    <div class="footer-col">
-      <h4>Enlaces Rápidos</h4>
-      <ul>
-        <li><a href="#habitaciones">Habitaciones</a></li>
-        <li><a href="#servicios">Servicios</a></li>
-        <li><a href="#resenas">Reseñas</a></li>
-        <li><a href="#contacto">Contacto</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h4>Contacto</h4>
-      <p><i class="fas fa-map-marker-alt"></i> Frente a Banpro, San Carlos</p>
-      <p><i class="fas fa-phone-alt"></i> +505 8853 6728</p>
-      <p><i class="fas fa-envelope"></i> info@hotelcostasur.com</p>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <p>© 2026 Hotel Costa Sur. Todos los derechos reservados.</p>
-    <div class="footer-links"><a href="#">Privacidad</a> | <a href="#">Términos y condiciones</a></div>
-  </div>
-</footer>
+    <div class="rooms-grid" id="roomsContainer"></div>
+  </section>
 
-<!-- POPUPS -->
-<div class="popup" id="registroPopup">
-  <div class="popup__content" style="max-width: 500px;">
-    <div class="close-icon" id="closeRegistroPopupBtn">&times;</div>
-    <h3 class="popup__title">Crear Cuenta</h3>
-    <p class="popup__subtitle">Completa tus datos para registrarte</p>
-    <form class="popup__form" id="registroForm">
-      <input type="text" id="regNombre" placeholder="Usuario" required>
-      <input type="email" id="regEmail" placeholder="Correo electrónico" required>
-      <input type="password" id="regPassword" placeholder="Contraseña" required>
-      <div class="popup__buttons">
-        <button type="button" class="popup__btn popup__btn--cerrar" id="cancelRegistroBtn">Cancelar</button>
-        <button type="submit" class="popup__btn popup__btn--reservar">Registrarse →</button>
+  <!-- SERVICIOS -->
+  <section id="servicios" class="section">
+    <h2 class="section__title">🌟 Servicios</h2>
+    <div class="services">
+      <div class="service-card">
+        <h3>🏆 Alojamiento de calidad</h3>
+        <p>Habitaciones cómodas y limpias para tu descanso.</p>
       </div>
-    </form>
-    <p style="margin-top: 1rem; font-size: 0.8rem;">¿Ya tienes cuenta? <a href="#" id="irLoginLink">Iniciar Sesión</a></p>
-  </div>
-</div>
-
-<div class="popup" id="loginPopup">
-  <div class="popup__content" style="max-width: 500px;">
-    <div class="close-icon" id="closeLoginPopupBtn">&times;</div>
-    <h3 class="popup__title">Iniciar Sesión</h3>
-    <p class="popup__subtitle">Ingresa tus credenciales</p>
-    <form class="popup__form" id="loginForm">
-      <input type="text" id="loginUsuario" placeholder="Nombre de usuario" required>
-      <input type="password" id="loginPassword" placeholder="Contraseña" required>
-      <div class="popup__buttons">
-        <button type="button" class="popup__btn popup__btn--cerrar" id="cancelLoginBtn">Cancelar</button>
-        <button type="submit" class="popup__btn popup__btn--reservar">Iniciar Sesión →</button>
+      <div class="service-card">
+        <h3>⏰ Atención 24/7</h3>
+        <p>Siempre disponibles para ti, día y noche.</p>
       </div>
-    </form>
-    <p style="margin-top: 1rem; font-size: 0.8rem;">¿No tienes cuenta? <a href="#" id="irRegistroLink">Regístrate aquí</a></p>
-  </div>
-</div>
-
-<div class="popup" id="reservaPopup">
-  <div class="popup__content" style="max-width: 600px; max-height: 90vh; overflow-y: auto;">
-    <div class="close-icon" id="closePopupBtn">&times;</div>
-    <h3 class="popup__title">Reservar Habitación</h3>
-    <p class="popup__subtitle" id="reservaHabitacionInfo"></p>
-    <form class="popup__form" id="popupForm">
-      <div class="form-group"><label class="form-label">Número de Cédula *</label><input type="text" id="cedula" placeholder="Cédula de Identidad" required></div>
-      <div class="form-row"><div class="form-group"><label class="form-label">Nombres *</label><input type="text" id="nombres" placeholder="Ej: María José" required></div><div class="form-group"><label class="form-label">Apellidos *</label><input type="text" id="apellidos" placeholder="Ej: Pérez González" required></div></div>
-      <div class="form-row"><div class="form-group"><label class="form-label">Sexo *</label><select id="sexo" required><option value="">Seleccione</option><option value="Masculino">Masculino</option><option value="Femenino">Femenino</option></select></div><div class="form-group"><label class="form-label">Fecha de Nacimiento *</label><input type="date" id="fechaNacimiento" required></div></div>
-      <div class="form-row"><div class="form-group"><label class="form-label">Nacionalidad *</label><input type="text" id="nacionalidad" placeholder="Ej: Nicaragüense" required></div><div class="form-group"><label class="form-label">Lugar de Procedencia *</label><input type="text" id="procedencia" placeholder="Ej: Managua" required></div></div>
-      <div class="form-row"><div class="form-group"><label class="form-label">Fecha de Entrada *</label><input type="date" id="fechaIngreso" required></div><div class="form-group"><label class="form-label">Fecha de Salida *</label><input type="date" id="fechaSalida" required></div></div>
-      <div class="form-row"><div class="form-group"><label class="form-label">Días de Estancia</label><input type="number" id="diasEstancia" readonly style="background:#f0f0f0;"></div><div class="form-group"><label class="form-label">Número de Huéspedes *</label><input type="number" id="numHuespedes" min="1" max="10" required></div></div>
-      <div class="form-group"><label class="form-label">Total a Pagar (C$)</label><input type="text" id="totalPago" readonly style="background:#f0f0f0; font-weight:bold;"></div>
-      <div class="form-group"><label class="form-label">Tipo de Pago *</label><select id="metodoPago" required><option value="">Seleccione método de pago</option><option value="presencial">Pago presencial en el hotel</option></select></div>
-      <div class="popup__buttons"><button type="button" class="popup__btn popup__btn--cerrar" id="cancelPopupBtn">Cancelar</button><button type="submit" class="popup__btn popup__btn--reservar">Confirmar Reserva ✨</button></div>
-    </form>
-  </div>
-</div>
-
-<div class="popup" id="detalleReservaPopup">
-  <div class="popup__content" style="max-width: 500px;"><div class="close-icon" id="closeDetallePopupBtn">&times;</div><h3 class="popup__title">Detalle de Reserva</h3><div id="detalleReservaContent"></div><button class="popup__btn popup__btn--cerrar" id="cerrarDetalleBtn" style="margin-top:1rem;">Cerrar</button></div>
-</div>
-
-<div class="popup" id="misReservasPopup">
-  <div class="popup__content" style="max-width:90%; width:900px; max-height:80vh; overflow-y:auto;"><div class="close-icon" id="closeMisReservasBtn">&times;</div><h3 class="popup__title">Mis Reservas</h3><div id="misReservasContent"></div></div>
-</div>
-
-<div class="popup" id="adminPopup">
-  <div class="popup__content" style="max-width:95%; width:1200px; max-height:85vh; overflow-y:auto;"><div class="close-icon" id="closeAdminBtn">&times;</div><h3 class="popup__title">Panel de Administrador</h3><div id="adminContent"></div></div>
-</div>
-
-<!-- CHATBOT FLOTANTE -->
-<div class="chatbot">
-  <div class="chatbot__button" id="chatbotToggle">
-    <i class="fas fa-comment-dots"></i>
-  </div>
-  <div class="chatbot__window" id="chatbotWindow">
-    <div class="chatbot__header">
-      <span>Preguntas Frecuentes</span>
-      <button id="chatbotClose">×</button>
+      <div class="service-card">
+        <h3>🤝 Servicio amable</h3>
+        <p>Trato cálido y personalizado.</p>
+      </div>
+      <div class="service-card">
+        <h3>🔒 Ambiente seguro</h3>
+        <p>Máxima seguridad durante tu estadía.</p>
+      </div>
     </div>
-    <div class="chatbot__messages" id="chatMessages">
-      <div class="bot-msg">¡Hola! ¿Necesitas ayuda? Pregúntame sobre horarios, precios, servicios o reservas.</div>
+  </section>
+
+  <!-- RESEÑAS -->
+  <section id="resenas" class="section section--gray">
+    <h2 class="section__title">⭐ Reseñas de Clientes</h2>
+    <div class="reviews">
+      <div class="review">
+        <p>"Excelente atención, muy limpio y cómodo. Volveré sin dudas."</p><span>⭐⭐⭐⭐⭐</span>
+      </div>
+      <div class="review">
+        <p>"Buena ubicación y personal súper amable, precios justos."</p><span>⭐⭐⭐⭐</span>
+      </div>
+      <div class="review">
+        <p>"Precio accesible, habitaciones amplias y vista increíble."</p><span>⭐⭐⭐⭐⭐</span>
+      </div>
     </div>
-    <div class="chatbot__faq-buttons">
-      <button data-question="horarios">⏰ Check-in/out</button>
-      <button data-question="precios">💰 Precios</button>
-      <button data-question="servicios">🍳 ¿Desayuno?</button>
-      <button data-question="wifi">📶 ¿WiFi?</button>
-      <button data-question="mascotas">🐾 ¿Mascotas?</button>
-      <button data-question="reservas">📅 ¿Cómo reservo?</button>
+  </section>
+
+  <!-- SECCIÓN MARKETING / SORTEO -->
+  <section class="section marketing-section" style="padding-bottom: 2rem;">
+    <div class="marketing-banner">
+      <div class="marketing-text">
+        <h2>🎁 ¡Gana una noche de estadía gratis!</h2>
+        <p>Participa en nuestro sorteo mensual. Solo déjanos tu nombre y correo, y te contactaremos si eres el afortunado ganador.</p>
+      </div>
+      <form class="marketing-form" id="sorteoForm">
+        <div class="marketing-form-grid">
+          <input type="text" id="sorteoNombres" placeholder="Nombres" required>
+          <input type="text" id="sorteoApellidos" placeholder="Apellidos" required>
+          <input type="email" id="sorteoEmail" placeholder="Correo electrónico" style="grid-column: 1 / -1;" required>
+          <input type="tel" id="sorteoTelefono" placeholder="Teléfono" required>
+          
+          <select id="sorteoDepartamento" required class="marketing-select">
+            <option value="">Departamento...</option>
+            <option value="Boaco">Boaco</option>
+            <option value="Carazo">Carazo</option>
+            <option value="Chinandega">Chinandega</option>
+            <option value="Chontales">Chontales</option>
+            <option value="Estelí">Estelí</option>
+            <option value="Granada">Granada</option>
+            <option value="Jinotega">Jinotega</option>
+            <option value="León">León</option>
+            <option value="Madriz">Madriz</option>
+            <option value="Managua">Managua</option>
+            <option value="Masaya">Masaya</option>
+            <option value="Matagalpa">Matagalpa</option>
+            <option value="Nueva Segovia">Nueva Segovia</option>
+            <option value="Rivas">Rivas</option>
+            <option value="Río San Juan">Río San Juan</option>
+            <option value="RACCN">Costa Caribe Norte (RACCN)</option>
+            <option value="RACCS">Costa Caribe Sur (RACCS)</option>
+          </select>
+
+          <select id="sorteoSexo" required class="marketing-select">
+            <option value="">Sexo...</option>
+            <option value="Masculino">Masculino</option>
+            <option value="Femenino">Femenino</option>
+            <option value="Otro">Otro</option>
+          </select>
+
+          <input type="number" id="sorteoEdad" placeholder="Edad" min="16" max="99" required>
+          <input type="text" id="sorteoOcupacion" placeholder="Ocupación / Profesión" required style="grid-column: 1 / -1;">
+        </div>
+        <button type="submit" class="marketing-btn">¡Participar ahora!</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- CONTACTO -->
+  <section id="contacto" class="section contacto-section">
+    <h2 class="section__title">Contáctanos</h2>
+    <p class="contacto-subtitle">Estamos aquí para ayudarte. Contáctanos por cualquiera de estos medios.</p>
+    <div class="contacto-grid">
+      <div class="contacto-info">
+        <div class="contacto-item">
+          <i class="fas fa-phone-alt"></i>
+          <div>
+            <h4>Teléfono</h4>
+            <p>+505 8853 6728</p>
+          </div>
+        </div>
+        <div class="contacto-item">
+          <i class="fas fa-envelope"></i>
+          <div>
+            <h4>Email</h4>
+            <p>info@hotelcostasur.com</p>
+          </div>
+        </div>
+        <div class="contacto-item">
+          <i class="fas fa-map-marker-alt"></i>
+          <div>
+            <h4>Dirección</h4>
+            <p>Frente a Banpro, San Carlos, Río San Juan, Nicaragua</p>
+          </div>
+        </div>
+      </div>
+      <div class="contacto-redes">
+        <a href="https://www.facebook.com/hotelcostasur/about" target="_blank" class="red-social"><i
+            class="fab fa-facebook-f"></i> Facebook</a>
+        <a href="https://www.tiktok.com/@hotelcostasur1" target="_blank" class="red-social"><i
+            class="fab fa-tiktok"></i> TikTok</a>
+        <a href="https://wa.me/50588536728" target="_blank" class="red-social"><i class="fab fa-whatsapp"></i>
+          WhatsApp</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER MODERNO -->
+  <footer class="footer-modern">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h3>Hotel Costa Sur</h3>
+        <p>San Carlos, Nicaragua</p>
+        <p class="footer-desc">Más de 27 años brindando hospitalidad de calidad en San Carlos, Río San Juan.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Enlaces Rápidos</h4>
+        <ul>
+          <li><a href="#habitaciones">Habitaciones</a></li>
+          <li><a href="#servicios">Servicios</a></li>
+          <li><a href="#resenas">Reseñas</a></li>
+          <li><a href="#contacto">Contacto</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contacto</h4>
+        <p><i class="fas fa-map-marker-alt"></i> Frente a Banpro, San Carlos</p>
+        <p><i class="fas fa-phone-alt"></i> +505 8853 6728</p>
+        <p><i class="fas fa-envelope"></i> info@hotelcostasur.com</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 Hotel Costa Sur. Todos los derechos reservados.</p>
+      <div class="footer-links"><a href="#">Privacidad</a> | <a href="#">Términos y condiciones</a></div>
+    </div>
+  </footer>
+
+  <!-- POPUPS -->
+  <div class="popup" id="registroPopup">
+    <div class="popup__content" style="max-width: 500px;">
+      <div class="close-icon" id="closeRegistroPopupBtn">&times;</div>
+      <h3 class="popup__title">Crear Cuenta</h3>
+      <p class="popup__subtitle">Completa tus datos para registrarte</p>
+      <form class="popup__form" id="registroForm">
+        <input type="text" id="regNombre" placeholder="Usuario" required>
+        <input type="email" id="regEmail" placeholder="Correo electrónico" required>
+        <input type="password" id="regPassword" placeholder="Contraseña" required>
+        <div class="popup__buttons">
+          <button type="button" class="popup__btn popup__btn--cerrar" id="cancelRegistroBtn">Cancelar</button>
+          <button type="submit" class="popup__btn popup__btn--reservar">Registrarse →</button>
+        </div>
+      </form>
+      <p style="margin-top: 1rem; font-size: 0.8rem;">¿Ya tienes cuenta? <a href="#" id="irLoginLink">Iniciar Sesión</a>
+      </p>
     </div>
   </div>
-</div>
 
-<script src="JS/script.js"></script>
+  <div class="popup" id="loginPopup">
+    <div class="popup__content" style="max-width: 500px;">
+      <div class="close-icon" id="closeLoginPopupBtn">&times;</div>
+      <h3 class="popup__title">Iniciar Sesión</h3>
+      <p class="popup__subtitle">Ingresa tus credenciales</p>
+      <form class="popup__form" id="loginForm">
+        <input type="text" id="loginUsuario" placeholder="Nombre de usuario" required>
+        <input type="password" id="loginPassword" placeholder="Contraseña" required>
+        <div class="popup__buttons">
+          <button type="button" class="popup__btn popup__btn--cerrar" id="cancelLoginBtn">Cancelar</button>
+          <button type="submit" class="popup__btn popup__btn--reservar">Iniciar Sesión →</button>
+        </div>
+      </form>
+      <p style="margin-top: 1rem; font-size: 0.8rem;">¿No tienes cuenta? <a href="#" id="irRegistroLink">Regístrate
+          aquí</a></p>
+    </div>
+  </div>
+
+  <div class="popup" id="reservaPopup">
+    <div class="popup__content" style="max-width: 600px; max-height: 90vh; overflow-y: auto;">
+      <div class="close-icon" id="closePopupBtn">&times;</div>
+      <h3 class="popup__title">Reservar Habitación</h3>
+      <p class="popup__subtitle" id="reservaHabitacionInfo"></p>
+      <form class="popup__form" id="popupForm">
+        <div class="form-group"><label class="form-label">Número de Cédula *</label><input type="text" id="cedula"
+            placeholder="Cédula de Identidad" required></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Nombres *</label><input type="text" id="nombres"
+              placeholder="Ej: María José" required></div>
+          <div class="form-group"><label class="form-label">Apellidos *</label><input type="text" id="apellidos"
+              placeholder="Ej: Pérez González" required></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Sexo *</label><select id="sexo" required>
+              <option value="">Seleccione</option>
+              <option value="Masculino">Masculino</option>
+              <option value="Femenino">Femenino</option>
+            </select></div>
+          <div class="form-group"><label class="form-label">Fecha de Nacimiento *</label><input type="date"
+              id="fechaNacimiento" required></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Nacionalidad *</label><input type="text" id="nacionalidad"
+              placeholder="Ej: Nicaragüense" required></div>
+          <div class="form-group"><label class="form-label">Lugar de Procedencia *</label><input type="text"
+              id="procedencia" placeholder="Ej: Managua" required></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Fecha de Entrada *</label><input type="date"
+              id="fechaIngreso" required></div>
+          <div class="form-group"><label class="form-label">Fecha de Salida *</label><input type="date" id="fechaSalida"
+              required></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Días de Estancia</label><input type="number"
+              id="diasEstancia" readonly style="background:#f0f0f0;"></div>
+          <div class="form-group"><label class="form-label">Número de Huéspedes *</label><input type="number"
+              id="numHuespedes" min="1" max="10" required></div>
+        </div>
+        <div class="form-group"><label class="form-label">Total a Pagar (C$)</label><input type="text" id="totalPago"
+            readonly style="background:#f0f0f0; font-weight:bold;"></div>
+        <div class="form-group"><label class="form-label">Tipo de Pago *</label><select id="metodoPago" required>
+            <option value="">Seleccione método de pago</option>
+            <option value="presencial">Pago presencial en el hotel</option>
+          </select></div>
+        <div class="popup__buttons"><button type="button" class="popup__btn popup__btn--cerrar"
+            id="cancelPopupBtn">Cancelar</button><button type="submit" class="popup__btn popup__btn--reservar">Confirmar
+            Reserva ✨</button></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="popup" id="detalleReservaPopup">
+    <div class="popup__content" style="max-width: 500px;">
+      <div class="close-icon" id="closeDetallePopupBtn">&times;</div>
+      <h3 class="popup__title">Detalle de Reserva</h3>
+      <div id="detalleReservaContent"></div><button class="popup__btn popup__btn--cerrar" id="cerrarDetalleBtn"
+        style="margin-top:1rem;">Cerrar</button>
+    </div>
+  </div>
+
+  <div class="popup" id="misReservasPopup">
+    <div class="popup__content" style="max-width:90%; width:900px; max-height:80vh; overflow-y:auto;">
+      <div class="close-icon" id="closeMisReservasBtn">&times;</div>
+      <h3 class="popup__title">Mis Reservas</h3>
+      <div id="misReservasContent"></div>
+    </div>
+  </div>
+
+  <div class="popup" id="adminPopup">
+    <div class="popup__content" style="max-width:95%; width:1200px; max-height:85vh; overflow-y:auto;">
+      <div class="close-icon" id="closeAdminBtn">&times;</div>
+      <h3 class="popup__title">Panel de Administrador</h3>
+      <div id="adminContent"></div>
+    </div>
+  </div>
+
+  <!-- CHATBOT FLOTANTE -->
+  <div class="chatbot">
+    <div class="chatbot__button" id="chatbotToggle">
+      <i class="fas fa-comment-dots"></i>
+    </div>
+    <div class="chatbot__window" id="chatbotWindow">
+      <div class="chatbot__header">
+        <span>Preguntas Frecuentes</span>
+        <button id="chatbotClose">×</button>
+      </div>
+      <div class="chatbot__messages" id="chatMessages">
+        <div class="bot-msg">¡Hola! ¿Necesitas ayuda? Pregúntame sobre horarios, precios, servicios o reservas.</div>
+      </div>
+      <div class="chatbot__faq-buttons">
+        <button data-question="horarios">⏰ Check-in/out</button>
+        <button data-question="precios">💰 Precios</button>
+        <button data-question="servicios">🍳 ¿Desayuno?</button>
+        <button data-question="wifi">📶 ¿WiFi?</button>
+        <button data-question="mascotas">🐾 ¿Mascotas?</button>
+        <button data-question="reservas">📅 ¿Cómo reservo?</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="JS/script.js"></script>
 </body>
+
 </html>

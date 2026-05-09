@@ -75,7 +75,7 @@ body.popup-open {
 
 .header__nav {
   display: flex;
-  gap: 1.8rem;
+  gap: 1.4rem;
   flex-wrap: wrap;
 }
 
@@ -83,6 +83,7 @@ body.popup-open {
   color: var(--texto-oscuro);
   text-decoration: none;
   font-weight: 600;
+  font-size: 0.85rem;
   transition: var(--transition);
 }
 
@@ -1342,3 +1343,94 @@ body.popup-open {
     grid-template-columns: 1fr;
   }
 }
+
+/* =================== ADMIN PANEL =================== */
+.admin-tabs {
+  display: flex;
+  gap: .6rem;
+  flex-wrap: wrap;
+  border-bottom: 2px solid #e4e4e7;
+  padding-bottom: .6rem;
+}
+.admin-tab {
+  padding: .55rem 1.2rem;
+  border: 1px solid #e4e4e7;
+  border-radius: 30px;
+  background: white;
+  font-weight: 600;
+  font-size: .88rem;
+  cursor: pointer;
+  color: var(--gris-texto);
+  transition: var(--transition);
+}
+.admin-tab.active,
+.admin-tab:hover {
+  background: var(--azul-profundo);
+  color: white;
+  border-color: var(--azul-profundo);
+}
+.adm-stat {
+  border-radius: 16px;
+  padding: 1.2rem 1rem;
+  text-align: center;
+  border: 1px solid rgba(0,0,0,.05);
+}
+.adm-num {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--texto-oscuro);
+  line-height: 1;
+  margin-bottom: .3rem;
+}
+.adm-lbl {
+  font-size: .8rem;
+  color: var(--gris-texto);
+  font-weight: 500;
+}
+.adm-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .88rem;
+}
+.adm-table th {
+  background: var(--azul-profundo);
+  color: white;
+  padding: .7rem .9rem;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.adm-table td {
+  padding: .65rem .9rem;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: top;
+}
+.adm-table tr:hover td {
+  background: #f9f9f9;
+}
+.adm-btn-green {
+  width: 100%;
+  padding: .5rem;
+  background: #00C853;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: .8rem;
+  transition: var(--transition);
+}
+.adm-btn-green:hover { background: #00a844; }
+.adm-btn-blue {
+  width: 100%;
+  padding: .5rem;
+  background: #0056b3;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: .8rem;
+  transition: var(--transition);
+}
+.adm-btn-blue:hover { background: #004494; }

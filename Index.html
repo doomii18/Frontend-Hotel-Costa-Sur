@@ -21,6 +21,7 @@
     <nav class="header__nav">
       <a href="#descripcion">Hotel</a>
       <a href="#habitaciones">Habitaciones</a>
+      <a href="#valores">Valores</a>
       <a href="#servicios">Servicios</a>
       <a href="#resenas">Reseñas</a>
       <a href="#contacto">Contacto</a>
@@ -138,24 +139,85 @@
     <div class="rooms-grid" id="roomsContainer"></div>
   </section>
 
+  <!-- VALORES -->
+  <section id="valores" class="section">
+    <h2 class="section__title">Nuestros <span class="highlight-cursive-blue">Valores</span></h2>
+    <p class="section-subtitle">Los pilares que nos guían para brindarte la mejor experiencia de hospedaje</p>
+    
+    <div class="cards-grid">
+      <div class="feature-card">
+        <div class="feature-card__icon-wrapper icon-red">
+          <i class="far fa-heart"></i>
+        </div>
+        <h3>Hospitalidad</h3>
+        <p>Hacemos sentir al huésped bienvenido y atendido con calidez desde su llegada.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card__icon-wrapper icon-blue">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 3C11 7.5 14 10.5 18 10.5C14 10.5 11 13.5 11 18C11 13.5 8 10.5 4 10.5C8 10.5 11 7.5 11 3Z" />
+            <path d="M19 3v4m-2-2h4" />
+            <circle cx="5" cy="18" r="1.5" />
+          </svg>
+        </div>
+        <h3>Limpieza</h3>
+        <p>Espacios limpios y ordenados que transmiten confianza y calidad.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card__icon-wrapper icon-yellow">
+          <i class="fas fa-award"></i>
+        </div>
+        <h3>Calidad</h3>
+        <p>Servicio eficiente con atención a los detalles, superando expectativas.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card__icon-wrapper icon-green">
+          <i class="fas fa-shield-alt"></i>
+        </div>
+        <h3>Seguridad</h3>
+        <p>Protección física y personal garantizada dentro de las instalaciones.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card__icon-wrapper icon-purple">
+          <i class="fas fa-user-friends"></i>
+        </div>
+        <h3>Respeto</h3>
+        <p>Trato con educación y consideración por las necesidades de cada cliente.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card__icon-wrapper icon-teal">
+          <i class="fas fa-leaf"></i>
+        </div>
+        <h3>Responsabilidad</h3>
+        <p>Sostenibilidad y apoyo comunitario con estrictos protocolos de seguridad.</p>
+      </div>
+    </div>
+  </section>
+
   <!-- SERVICIOS -->
   <section id="servicios" class="section">
-    <h2 class="section__title">🌟 Servicios</h2>
-    <div class="services">
-      <div class="service-card">
-        <h3>🏆 Alojamiento de calidad</h3>
+    <h2 class="section__title">Nuestros <span class="highlight-cursive-blue">Servicios</span></h2>
+    <p class="section-subtitle">Todo lo que necesitas para una estadía cómoda y placentera</p>
+    <div class="cards-grid">
+      <div class="feature-card">
+        <div class="feature-card__icon-wrapper icon-yellow">
+          <i class="fas fa-trophy"></i>
+        </div>
+        <h3>Alojamiento de calidad</h3>
         <p>Habitaciones cómodas y limpias para tu descanso.</p>
       </div>
-      <div class="service-card">
-        <h3>⏰ Atención 24/7</h3>
+      <div class="feature-card">
+        <div class="feature-card__icon-wrapper icon-blue">
+          <i class="far fa-clock"></i>
+        </div>
+        <h3>Atención 24/7</h3>
         <p>Siempre disponibles para ti, día y noche.</p>
       </div>
-      <div class="service-card">
-        <h3>🤝 Servicio amable</h3>
-        <p>Trato cálido y personalizado.</p>
-      </div>
-      <div class="service-card">
-        <h3>🔒 Ambiente seguro</h3>
+      <div class="feature-card">
+        <div class="feature-card__icon-wrapper icon-red">
+          <i class="fas fa-lock"></i>
+        </div>
+        <h3>Ambiente seguro</h3>
         <p>Máxima seguridad durante tu estadía.</p>
       </div>
     </div>
@@ -335,13 +397,31 @@
   </div>
 
   <div class="popup" id="reservaPopup">
-    <div class="popup__content" style="max-width: 600px; max-height: 90vh; overflow-y: auto;">
+    <div class="popup__content" style="max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto;">
       <div class="close-icon" id="closePopupBtn">&times;</div>
       <h3 class="popup__title">Reservar Habitación</h3>
       <p class="popup__subtitle" id="reservaHabitacionInfo"></p>
       <form class="popup__form" id="popupForm">
-        <div class="form-group"><label class="form-label">Número de Cédula *</label><input type="text" id="cedula"
-            placeholder="Cédula de Identidad" required></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Tipo de Documento *</label><select id="tipoDocumento" required>
+              <option value="cedula">Cédula de Identidad</option>
+              <option value="pasaporte">Pasaporte</option>
+            </select></div>
+          <div class="form-group" id="containerCedula"><label class="form-label">Número de Cédula *</label><input type="text" id="cedula" placeholder="Cédula de Identidad" required></div>
+        </div>
+        <div class="form-row" id="containerPasaporte" style="display: none;">
+          <div class="form-group"><label class="form-label">País Emisor *</label><select id="paisPasaporte">
+              <option value="">Seleccione país...</option>
+              <option value="Belice">Belice</option>
+              <option value="Costa Rica">Costa Rica</option>
+              <option value="El Salvador">El Salvador</option>
+              <option value="Guatemala">Guatemala</option>
+              <option value="Honduras">Honduras</option>
+              <option value="Nicaragua">Nicaragua</option>
+              <option value="Panamá">Panamá</option>
+            </select></div>
+          <div class="form-group"><label class="form-label">No. Pasaporte *</label><input type="text" id="pasaporte" placeholder="Número de Pasaporte"></div>
+        </div>
         <div class="form-row">
           <div class="form-group"><label class="form-label">Nombres *</label><input type="text" id="nombres"
               placeholder="Ej: María José" required></div>
@@ -360,7 +440,7 @@
         <div class="form-row">
           <div class="form-group"><label class="form-label">Nacionalidad *</label><input type="text" id="nacionalidad"
               placeholder="Ej: Nicaragüense" required></div>
-          <div class="form-group"><label class="form-label">Lugar de Procedencia *</label><input type="text"
+          <div class="form-group"><label class="form-label">Ciudad de procedencia *</label><input type="text"
               id="procedencia" placeholder="Ej: Managua" required></div>
         </div>
         <div class="form-row">
@@ -378,8 +458,7 @@
         <div class="form-group"><label class="form-label">Total a Pagar (C$)</label><input type="text" id="totalPago"
             readonly style="background:#f0f0f0; font-weight:bold;"></div>
         <div class="form-group"><label class="form-label">Tipo de Pago *</label><select id="metodoPago" required>
-            <option value="">Seleccione método de pago</option>
-            <option value="presencial">Pago presencial en el hotel</option>
+            <option value="presencial" selected>Pago presencial en el hotel</option>
           </select></div>
         <div class="popup__buttons"><button type="button" class="popup__btn popup__btn--cerrar"
             id="cancelPopupBtn">Cancelar</button><button type="submit" class="popup__btn popup__btn--reservar">Confirmar
@@ -410,6 +489,21 @@
       <div class="close-icon" id="closeAdminBtn">&times;</div>
       <h3 class="popup__title">Panel de Administrador</h3>
       <div id="adminContent"></div>
+    </div>
+  </div>
+
+  <div class="popup" id="reservaExitosaPopup">
+    <div class="popup__content" style="max-width: 700px; width: 90%; text-align: center;">
+      <div class="close-icon" id="closeExitosaPopupBtn">&times;</div>
+      <div style="font-size: 4rem; color: #00C853; margin-bottom: 1rem;"><i class="fas fa-check-circle"></i></div>
+      <h3 class="popup__title">¡Reserva Confirmada!</h3>
+      <div id="reservaExitosaDetalles" style="text-align: left; background: var(--blanco-suave); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; font-size: 0.95rem; color: var(--texto-oscuro); line-height: 1.6;">
+      </div>
+      <div style="background: #fffbe6; color: #d48806; padding: 1rem; border-radius: 12px; border: 1px solid #ffe58f; margin-bottom: 1.5rem; font-weight: 600; font-size: 0.95rem; display: flex; align-items: flex-start; gap: 1rem; text-align: left;">
+        <i class="fas fa-exclamation-triangle" style="font-size: 1.5rem; margin-top: 2px;"></i>
+        <span id="mensajeImportanteReserva">¡IMPORTANTE! El día que reservó debe presentarse para poder pagar la habitación y disfrutar su estadía.</span>
+      </div>
+      <button class="popup__btn popup__btn--reservar" id="btnAceptarExitosa" style="width: 100%;">Aceptar y Cerrar</button>
     </div>
   </div>
 

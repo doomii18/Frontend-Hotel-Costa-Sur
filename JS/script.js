@@ -106,9 +106,29 @@ function crearReserva(reservaData) {
   const nuevaReserva = { id: Date.now(), usuarioId: usuario.id, usuarioNombre: usuario.nombre, ...reservaData, fechaReserva: new Date().toISOString() };
   reservas.push(nuevaReserva);
   setReservas(reservas);
+  
   const habitacion = habitaciones.find(h => h.id === reservaData.habitacionId);
   if (habitacion) habitacion.disponible = false;
-  alert(`✅ RESERVA CONFIRMADA ${usuario.nombre}!\n\nHabitación: ${reservaData.habitacionNombre}\n💰 Precio por noche: C$${reservaData.precioPorNoche}\n📅 Entrada: ${reservaData.fechaIngreso} | Salida: ${reservaData.fechaSalida}\n📆 Días: ${reservaData.dias}\n👥 Huéspedes: ${reservaData.huespedes}\n💳 Método de pago: ${reservaData.metodoPago}\n💵 TOTAL: C$${reservaData.total}\n\n👤 Datos del huésped:\n📛 ${reservaData.nombres} ${reservaData.apellidos}\n🆔 Cédula: ${reservaData.cedula}\n🎂 ${reservaData.fechaNacimiento} · ${reservaData.sexo}\n🌍 ${reservaData.nacionalidad} · 📍 ${reservaData.procedencia}\n\n¡Gracias por reservar en Hotel Costa Sur!`);
+  
+  const idText = reservaData.tipoDocumento === 'pasaporte' ? `Pasaporte: ${reservaData.pasaporte} (${reservaData.paisPasaporte})` : `Cédula: ${reservaData.cedula}`;
+  
+  const detallesHTML = `
+    <strong>Habitación:</strong> ${reservaData.habitacionNombre}<br>
+    <strong>Precio por noche:</strong> C$${reservaData.precioPorNoche}<br>
+    <strong>Entrada:</strong> ${reservaData.fechaIngreso} | <strong>Salida:</strong> ${reservaData.fechaSalida}<br>
+    <strong>Días:</strong> ${reservaData.dias} | <strong>Huéspedes:</strong> ${reservaData.huespedes}<br>
+    <strong>Método de pago:</strong> Pago presencial en el hotel<br>
+    <strong>TOTAL:</strong> C$${reservaData.total}<br><br>
+    <div style="border-top: 1px solid #e4e4e7; margin: 0.8rem 0; padding-top: 0.8rem;">
+      <strong>👤 Datos del huésped:</strong><br>
+      ${reservaData.nombres} ${reservaData.apellidos}<br>
+      ${idText}<br>
+      ${reservaData.nacionalidad} · ${reservaData.procedencia}
+    </div>
+  `;
+  
+  document.getElementById('reservaExitosaDetalles').innerHTML = detallesHTML;
+  document.getElementById('mensajeImportanteReserva').textContent = `¡IMPORTANTE! El día ${reservaData.fechaIngreso} debe presentarse a realizar el pago.`;
   return true;
 }
 
@@ -342,11 +362,66 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     document.getElementById('fechaIngreso')?.addEventListener('change', actualizarTotal);
     document.getElementById('fechaSalida')?.addEventListener('change', actualizarTotal);
+    // Toggle documento
+    document.getElementById('tipoDocumento')?.addEventListener('change', (e) => {
+      const isPasaporte = e.target.value === 'pasaporte';
+      document.getElementById('containerCedula').style.display = isPasaporte ? 'none' : 'block';
+      document.getElementById('cedula').required = !isPasaporte;
+      
+      document.getElementById('containerPasaporte').style.display = isPasaporte ? 'flex' : 'none';
+      document.getElementById('paisPasaporte').required = isPasaporte;
+      document.getElementById('pasaporte').required = isPasaporte;
+    });
+
+    // Formateo automático de cédula
+    document.getElementById('cedula')?.addEventListener('input', (e) => {
+      let val = e.target.value.toUpperCase().replace(/[^0-9A-Z]/g, '');
+      if (val.length > 14) val = val.slice(0, 14);
+      let formatted = '';
+      if (val.length > 0) formatted += val.substring(0, 3);
+      if (val.length > 3) formatted += '-' + val.substring(3, 9);
+      if (val.length > 9) formatted += '-' + val.substring(9, 14);
+      e.target.value = formatted;
+    });
+
     reservaForm.addEventListener('submit', (e) => {
       e.preventDefault();
       if (!habitacionSeleccionada) { alert("Selecciona una habitación."); return; }
-      const campos = ['cedula','nombres','apellidos','sexo','fechaNacimiento','nacionalidad','procedencia','fechaIngreso','fechaSalida','numHuespedes','metodoPago'];
-      for (let id of campos) if (!document.getElementById(id).value) { alert("Completa todos los campos."); return; }
+      
+      const tipoDoc = document.getElementById('tipoDocumento').value;
+      const camposBase = ['nombres','apellidos','sexo','fechaNacimiento','nacionalidad','procedencia','fechaIngreso','fechaSalida','numHuespedes','metodoPago'];
+      if (tipoDoc === 'pasaporte') camposBase.push('paisPasaporte', 'pasaporte');
+      else camposBase.push('cedula');
+      
+      for (let id of camposBase) if (!document.getElementById(id).value) { alert("Completa todos los campos requeridos."); return; }
+      
+      // Validaciones de documentos
+      if (tipoDoc === 'pasaporte') {
+        const pais = document.getElementById('paisPasaporte').value;
+        const pasaporte = document.getElementById('pasaporte').value.trim().toUpperCase();
+        const reglasPasaporte = {
+          "Belice": /^[A-Z0-9]{6,12}$/,
+          "Costa Rica": /^[A-Z0-9]{7,12}$/,
+          "El Salvador": /^[A-Z][0-9]{8}$/,
+          "Guatemala": /^[A-Z0-9]{8,13}$/,
+          "Honduras": /^[A-Z0-9]{9,13}$/,
+          "Nicaragua": /^[A-Z]?[0-9]{7,8}$/,
+          "Panamá": /^[A-Z0-9-]{7,15}$/
+        };
+        
+        if (reglasPasaporte[pais] && !reglasPasaporte[pais].test(pasaporte)) {
+          alert(`El formato del pasaporte no es válido para ${pais}. Verifique que esté correcto y no tenga espacios u otros caracteres inválidos.`);
+          return;
+        }
+      } else {
+        const cedula = document.getElementById('cedula').value.trim();
+        const cedulaRegex = /^\d{3}-\d{6}-\d{4}[A-Z]$/;
+        if (!cedulaRegex.test(cedula)) {
+          alert("El formato de la Cédula de Identidad Nicaragüense no es válido.\nDebe ser: 000-000000-0000X (con la última letra en mayúscula).");
+          return;
+        }
+      }
+
       const dias = calcularDias(document.getElementById('fechaIngreso').value, document.getElementById('fechaSalida').value);
       if (dias <= 0) { alert("La fecha de salida debe ser posterior."); return; }
       const total = habitacionSeleccionada.precio * dias;
@@ -354,7 +429,10 @@ document.addEventListener('DOMContentLoaded', () => {
         habitacionId: habitacionSeleccionada.id,
         habitacionNombre: habitacionSeleccionada.nombre,
         precioPorNoche: habitacionSeleccionada.precio,
+        tipoDocumento: tipoDoc,
         cedula: document.getElementById('cedula').value,
+        paisPasaporte: document.getElementById('paisPasaporte')?.value || '',
+        pasaporte: document.getElementById('pasaporte')?.value || '',
         nombres: document.getElementById('nombres').value,
         apellidos: document.getElementById('apellidos').value,
         sexo: document.getElementById('sexo').value,
@@ -373,11 +451,12 @@ document.addEventListener('DOMContentLoaded', () => {
         reservaForm.reset();
         habitacionSeleccionada = null;
         renderRooms(currentFilter);
+        mostrarPopup('reservaExitosaPopup');
       }
     });
   }
   // Botones de cierre
-  const closeIds = ['closeRegistroPopupBtn','cancelRegistroBtn','closeLoginPopupBtn','cancelLoginBtn','closePopupBtn','cancelPopupBtn','closeDetallePopupBtn','cerrarDetalleBtn','closeMisReservasBtn','closeAdminBtn'];
+  const closeIds = ['closeRegistroPopupBtn','cancelRegistroBtn','closeLoginPopupBtn','cancelLoginBtn','closePopupBtn','cancelPopupBtn','closeDetallePopupBtn','cerrarDetalleBtn','closeMisReservasBtn','closeAdminBtn', 'closeExitosaPopupBtn', 'btnAceptarExitosa'];
   closeIds.forEach(id => {
     const btn = document.getElementById(id);
     if (btn) {

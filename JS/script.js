@@ -101,7 +101,7 @@ function loginUsuario(nombre, password) {
     const adminObj = { id: 'admin-hcs', nombre: ADMIN_USER, rol: 'admin' };
     setUsuarioActual(adminObj);
     actualizarHeaderUsuario();
-    showToast('Bienvenido, Administrador 🔧', 'success');
+    showToast('Bienvenido, Administrador', 'success');
     return 'admin';
   }
   // ── Acceso de huésped normal ──

@@ -1,6 +1,6 @@
 // ================================================================
 //  usuario.js  — Lógica exclusiva del usuario / huésped
-//  Hotel Costa Sur  |  Depende de: data.js
+//  Hotel Costa Sur  |  Depende de: data.js (Conexión SQL Server)
 // ================================================================
 
 // =================== ESTADO LOCAL ===================
@@ -29,7 +29,7 @@ function actualizarHeaderUsuario() {
   }
 }
 
-// =================== RENDERIZAR HABITACIONES ===================
+// =================== RENDERIZAR HABITACIONES (DESDE SQL SERVER) ===================
 function renderRooms(filter = "all") {
   const container = document.getElementById('roomsContainer');
   if (!container) return;
@@ -143,7 +143,8 @@ function mostrarMisReservas() {
   const usuario = getUsuarioActual();
   if (!usuario) { alert("Debes iniciar sesión."); mostrarPopup('loginPopup'); return; }
 
-  const reservas  = getReservas().filter(r => r.usuarioId === usuario.id);
+  // Sincronizar y obtener reservas
+  const reservas  = getReservas();
   const container = document.getElementById('misReservasContent');
 
   if (reservas.length === 0) {
@@ -165,43 +166,42 @@ function mostrarMisReservas() {
   mostrarPopup('misReservasPopup');
 }
 
-// =================== CANCELAR RESERVA (huésped) ===================
-function cancelarReserva(reservaId) {
-  let reservas = getReservas();
-  const reserva = reservas.find(r => r.id === reservaId);
-  if (!reserva) { showToast('Reserva no encontrada.', 'error'); return; }
-
-  const habitacion = habitaciones.find(h => h.id === reserva.habitacionId);
-  if (habitacion) habitacion.disponible = true;
-
-  reservas = reservas.filter(r => r.id !== reservaId);
-  setReservas(reservas);
-  showToast(`Reserva de ${reserva.habitacionNombre} cancelada.`, 'info');
+// =================== CANCELAR RESERVA (SQL SERVER) ===================
+window.cancelarReserva = async function(reservaId) {
+  if (!confirm('¿Deseas cancelar esta reserva?')) return;
+  
+  try {
+    const res = await apiCall(`/reservas/${reservaId}`, { method: 'DELETE' });
+    showToast(res.message, 'success');
+    await syncDataFromBackend();
+    await fetchHabitaciones();
+  } catch (err) {
+    showToast(err.message, 'error');
+    return;
+  }
 
   const misReservasPopup = document.getElementById('misReservasPopup');
   if (misReservasPopup && misReservasPopup.style.display === 'flex') mostrarMisReservas();
   renderRooms(currentFilter);
-}
+};
 
-// =================== CREAR RESERVA ===================
-function crearReserva(reservaData) {
+// =================== CREAR RESERVA (SQL SERVER) ===================
+async function crearReserva(reservaData) {
   const usuario = getUsuarioActual();
   if (!usuario) { showToast('Debes iniciar sesión para reservar.', 'warning'); return false; }
 
-  const reservas     = getReservas();
-  const nuevaReserva = {
-    id: Date.now(),
-    usuarioId:    usuario.id,
-    usuarioNombre:usuario.nombre,
-    ...reservaData,
-    estado:       'pendiente',
-    fechaReserva: new Date().toISOString()
-  };
-  reservas.push(nuevaReserva);
-  setReservas(reservas);
-
-  const habitacion = habitaciones.find(h => h.id === reservaData.habitacionId);
-  if (habitacion) habitacion.disponible = false;
+  try {
+    const res = await apiCall('/reservas', {
+      method: 'POST',
+      body: JSON.stringify(reservaData)
+    });
+    showToast(res.message, 'success');
+    await syncDataFromBackend();
+    await fetchHabitaciones();
+  } catch (err) {
+    showToast(err.message, 'error');
+    return false;
+  }
 
   const idText = reservaData.tipoDocumento === 'pasaporte'
     ? `Pasaporte: ${reservaData.pasaporte} (${reservaData.paisPasaporte})`
@@ -255,21 +255,24 @@ function initChatbot() {
 }
 
 // =================== INICIALIZACIÓN (DOMContentLoaded) ===================
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   initData();
-  reconciliarDisponibilidad();
+  
+  // 📡 Conectar a SQL Server y cargar habitaciones del backend
+  await initBackendConnection();
+
   renderRooms("all");
   setupFilters();
   actualizarHeaderUsuario();
   initChatbot();
 
   // ── Registro ──────────────────────────────────────────
-  document.getElementById('registroForm')?.addEventListener('submit', (e) => {
+  document.getElementById('registroForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const nombre   = document.getElementById('regNombre').value.trim();
     const email    = document.getElementById('regEmail').value.trim();
     const password = document.getElementById('regPassword').value;
-    if (registrarUsuario({ nombre, email, password })) {
+    if (await registrarUsuario({ nombre, email, password })) {
       cerrarPopup('registroPopup');
       document.getElementById('registroForm').reset();
       mostrarPopup('loginPopup');
@@ -277,11 +280,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ── Login ─────────────────────────────────────────────
-  document.getElementById('loginForm')?.addEventListener('submit', (e) => {
+  document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const usuario  = document.getElementById('loginUsuario').value.trim();
     const password = document.getElementById('loginPassword').value;
-    const result   = loginUsuario(usuario, password);
+    const result   = await loginUsuario(usuario, password);
     if (result) {
       actualizarHeaderUsuario();
       cerrarPopup('loginPopup');
@@ -289,6 +292,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (result === 'admin') {
         // Redirigir al panel de administrador
         window.location.href = 'admin.html';
+      } else {
+        renderRooms("all");
       }
     }
   });
@@ -330,11 +335,11 @@ document.addEventListener('DOMContentLoaded', () => {
       e.target.value = formatted;
     });
 
-    reservaForm.addEventListener('submit', (e) => {
+    reservaForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!habitacionSeleccionada) { showToast('Selecciona una habitación primero.', 'warning'); return; }
 
-      const tipoDoc    = document.getElementById('tipoDocumento').value;
+      const tipoDoc = document.getElementById('tipoDocumento').value;
       const camposBase = ['nombres','apellidos','sexo','fechaNacimiento','nacionalidad',
                           'procedencia','fechaIngreso','fechaSalida','numHuespedes','metodoPago'];
       if (tipoDoc === 'pasaporte') camposBase.push('paisPasaporte','pasaporte');
@@ -394,7 +399,7 @@ document.addEventListener('DOMContentLoaded', () => {
         total:           habitacionSeleccionada.precio * dias
       };
 
-      if (crearReserva(reservaData)) {
+      if (await crearReserva(reservaData)) {
         cerrarPopup('reservaPopup');
         reservaForm.reset();
         habitacionSeleccionada = null;
@@ -458,6 +463,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('logoutBtn')?.addEventListener('click', () => {
     logoutUsuario();
     actualizarHeaderUsuario();
+    renderRooms("all");
   });
   // Enlace admin → redirige a la página de administrador
   document.getElementById('adminNavLink')?.addEventListener('click', (e) => {
@@ -465,10 +471,10 @@ document.addEventListener('DOMContentLoaded', () => {
     window.location.href = 'admin.html';
   });
 
-  // ── Sorteo / Lead Capture ─────────────────────────────
+  // ── Sorteo / Lead Capture (SQL SERVER DIRECTO) ─────────────────────────────
   const sorteoForm = document.getElementById('sorteoForm');
   if (sorteoForm) {
-    sorteoForm.addEventListener('submit', (e) => {
+    sorteoForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const nombres      = document.getElementById('sorteoNombres').value.trim();
       const apellidos    = document.getElementById('sorteoApellidos').value.trim();
@@ -478,11 +484,19 @@ document.addEventListener('DOMContentLoaded', () => {
       const sexo         = document.getElementById('sorteoSexo').value;
       const edad         = document.getElementById('sorteoEdad').value;
       const ocupacion    = document.getElementById('sorteoOcupacion').value.trim();
-      let leads = JSON.parse(localStorage.getItem('sorteoLeads')) || [];
-      leads.push({ nombres, apellidos, email, telefono, departamento, sexo, edad, ocupacion, fecha: new Date().toISOString() });
-      localStorage.setItem('sorteoLeads', JSON.stringify(leads));
-      showToast(`¡Gracias por participar, ${nombres}! 🎉 Te contactaremos si ganas.`, 'success');
-      sorteoForm.reset();
+      
+      const leadData = { nombres, apellidos, email, telefono, departamento, sexo, edad: parseInt(edad) || 0, ocupacion };
+
+      try {
+        const res = await apiCall('/sorteos', {
+          method: 'POST',
+          body: JSON.stringify(leadData)
+        });
+        showToast(res.message, 'success');
+        sorteoForm.reset();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
     });
   }
 

@@ -1,6 +1,6 @@
 // ================================================================
 //  admin.js  — Lógica exclusiva del panel de administrador
-//  Hotel Costa Sur  |  Depende de: data.js
+//  Hotel Costa Sur  |  Depende de: data.js (Conexión SQL Server)
 // ================================================================
 
 // ── Guardia: si no es admin, redirigir al inicio ──────────────
@@ -39,57 +39,72 @@ window.switchAdminTab = function(tab, btn) {
 
   // ── DASHBOARD ────────────────────────────────────────
   if (tab === 'dashboard') {
-    const pendientes  = reservas.filter(r => !r.estado || r.estado === 'pendiente').length;
+    const pendientes  = reservas.filter(r => r.estado === 'pendiente' || !r.estado).length;
     const activas     = reservas.filter(r => r.estado === 'activo').length;
     const completadas = reservas.filter(r => r.estado === 'completado').length;
     const libres      = habitaciones.filter(h => h.disponible).length;
-    const ingresos    = reservas
-      .filter(r => r.estado === 'completado')
-      .reduce((sum, r) => sum + (r.total || 0), 0);
 
     content.innerHTML = `
       <div class="adm-stats-grid">
         <div class="adm-stat adm-stat--blue">
-          <i class="fas fa-users adm-stat__icon"></i>
-          <div class="adm-num">${users.length}</div>
-          <div class="adm-lbl">Usuarios registrados</div>
+          <div class="adm-stat__icon-box">
+            <i class="fas fa-users"></i>
+          </div>
+          <div class="adm-stat__info">
+            <div class="adm-num">${users.length}</div>
+            <div class="adm-lbl">Usuarios registrados</div>
+          </div>
         </div>
-        <div class="adm-stat adm-stat--gray">
-          <i class="fas fa-calendar-check adm-stat__icon"></i>
-          <div class="adm-num">${reservas.length}</div>
-          <div class="adm-lbl">Reservas totales</div>
+        <div class="adm-stat adm-stat--indigo">
+          <div class="adm-stat__icon-box">
+            <i class="fas fa-calendar-check"></i>
+          </div>
+          <div class="adm-stat__info">
+            <div class="adm-num">${reservas.length}</div>
+            <div class="adm-lbl">Reservas totales</div>
+          </div>
         </div>
         <div class="adm-stat adm-stat--orange">
-          <i class="fas fa-clock adm-stat__icon"></i>
-          <div class="adm-num">${pendientes}</div>
-          <div class="adm-lbl">Pendientes de llegada</div>
+          <div class="adm-stat__icon-box">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="adm-stat__info">
+            <div class="adm-num">${pendientes}</div>
+            <div class="adm-lbl">Pendientes de llegada</div>
+          </div>
         </div>
         <div class="adm-stat adm-stat--green">
-          <i class="fas fa-door-open adm-stat__icon"></i>
-          <div class="adm-num">${activas}</div>
-          <div class="adm-lbl">Huéspedes activos</div>
+          <div class="adm-stat__icon-box">
+            <i class="fas fa-door-open"></i>
+          </div>
+          <div class="adm-stat__info">
+            <div class="adm-num">${activas}</div>
+            <div class="adm-lbl">Huéspedes activos</div>
+          </div>
         </div>
         <div class="adm-stat adm-stat--purple">
-          <i class="fas fa-check-double adm-stat__icon"></i>
-          <div class="adm-num">${completadas}</div>
-          <div class="adm-lbl">Completadas</div>
+          <div class="adm-stat__icon-box">
+            <i class="fas fa-check-double"></i>
+          </div>
+          <div class="adm-stat__info">
+            <div class="adm-num">${completadas}</div>
+            <div class="adm-lbl">Reservas completadas</div>
+          </div>
         </div>
         <div class="adm-stat adm-stat--teal">
-          <i class="fas fa-bed adm-stat__icon"></i>
-          <div class="adm-num">${libres}</div>
-          <div class="adm-lbl">Habitaciones libres</div>
-        </div>
-        <div class="adm-stat adm-stat--gold" style="grid-column: span 2;">
-          <i class="fas fa-coins adm-stat__icon"></i>
-          <div class="adm-num">C$${ingresos.toLocaleString('es-NI')}</div>
-          <div class="adm-lbl">Ingresos confirmados</div>
+          <div class="adm-stat__icon-box">
+            <i class="fas fa-bed"></i>
+          </div>
+          <div class="adm-stat__info">
+            <div class="adm-num">${libres}</div>
+            <div class="adm-lbl">Habitaciones libres</div>
+          </div>
         </div>
       </div>
       <p class="adm-hint">Usa las pestañas superiores para gestionar habitaciones, reservas y usuarios.</p>`;
 
   // ── HABITACIONES ─────────────────────────────────────
   } else if (tab === 'habitaciones') {
-    reconciliarDisponibilidad();
     content.innerHTML = `
       <div class="adm-rooms-grid">${
         habitaciones.map(h => {
@@ -189,12 +204,13 @@ function buildUsuariosTable(users) {
           <th>Usuario</th><th>Email</th><th>Fecha registro</th><th>Reservas</th><th>Acciones</th>
         </tr></thead>
         <tbody>${users.map(u => {
-          const numRes = getReservas().filter(r => r.usuarioId === u.id).length;
+          const numRes = getReservas().filter(r => String(r.usuarioId) === String(u.id)).length;
+          const regDate = u.fechaRegistro ? new Date(u.fechaRegistro).toLocaleDateString('es-NI') : '—';
           return `
           <tr>
             <td><strong>${u.nombre}</strong></td>
             <td>${u.email}</td>
-            <td style="font-size:.82rem;">${new Date(u.fechaRegistro).toLocaleDateString('es-NI')}</td>
+            <td style="font-size:.82rem;">${regDate}</td>
             <td style="text-align:center;">${numRes}</td>
             <td style="display:flex;gap:.4rem;flex-wrap:wrap;">
               <button onclick="formEditarUsuario('${u.id}')"  class="adm-btn adm-btn--primary" style="font-size:.78rem;">✏️ Editar</button>
@@ -224,56 +240,72 @@ window.filtrarTablaUsuarios = function(q) {
   document.getElementById('usrTable').innerHTML = buildUsuariosTable(filtered);
 };
 
-// =================== CHECK-IN / CHECK-OUT ===================
-window.adminCheckIn = function(reservaId) {
+// =================== CHECK-IN / CHECK-OUT (SQL SERVER DIRECTO) ===================
+window.adminCheckIn = async function(reservaId) {
   if (!confirm('¿Confirmar que el huésped pagó y realizó el check-in?')) return;
-  const reservas = getReservas();
-  const idx      = reservas.findIndex(r => r.id === reservaId);
-  if (idx === -1) { showToast('Reserva no encontrada.', 'error'); return; }
-  reservas[idx].estado      = 'activo';
-  reservas[idx].fechaCheckIn = new Date().toISOString();
-  setReservas(reservas);
-  showToast(`✅ Check-in confirmado para ${reservas[idx].nombres} ${reservas[idx].apellidos}`, 'success');
+  
+  try {
+    const res = await apiCall(`/reservas/checkin/${reservaId}`, { method: 'PUT' });
+    showToast(res.message, 'success');
+    await syncDataFromBackend();
+  } catch (err) {
+    showToast(err.message, 'error');
+    return;
+  }
+  
   switchAdminTab('habitaciones', document.getElementById('tab-habitaciones'));
 };
 
-window.adminCheckOut = function(reservaId) {
+window.adminCheckOut = async function(reservaId) {
   if (!confirm('¿Confirmar check-out y liberar la habitación?')) return;
-  const reservas = getReservas();
-  const idx      = reservas.findIndex(r => r.id === reservaId);
-  if (idx === -1) { showToast('Reserva no encontrada.', 'error'); return; }
-  reservas[idx].estado       = 'completado';
-  reservas[idx].fechaCheckOut = new Date().toISOString();
-  setReservas(reservas);
-  const hab = habitaciones.find(h => h.id === reservas[idx].habitacionId);
-  if (hab) hab.disponible = true;
-  showToast(`🚪 Check-out realizado. Habitación ${reservas[idx].habitacionNombre} liberada.`, 'info');
+  
+  try {
+    const res = await apiCall(`/reservas/checkout/${reservaId}`, { method: 'PUT' });
+    showToast(res.message, 'success');
+    await syncDataFromBackend();
+    await fetchHabitaciones();
+  } catch (err) {
+    showToast(err.message, 'error');
+    return;
+  }
+  
   switchAdminTab('habitaciones', document.getElementById('tab-habitaciones'));
 };
 
-// =================== CRUD RESERVAS ===================
-window.adminEliminarReserva = function(reservaId) {
+// =================== CRUD RESERVAS (SQL SERVER DIRECTO) ===================
+window.adminEliminarReserva = async function(reservaId) {
   if (!confirm('¿Eliminar esta reserva definitivamente?')) return;
-  let reservas = getReservas();
-  const r      = reservas.find(r => r.id === reservaId);
-  if (!r) return;
-  const hab = habitaciones.find(h => h.id === r.habitacionId);
-  if (hab && r.estado !== 'completado') hab.disponible = true;
-  setReservas(reservas.filter(r => r.id !== reservaId));
-  showToast('Reserva eliminada.', 'info');
+  
+  try {
+    const res = await apiCall(`/reservas/${reservaId}`, { method: 'DELETE' });
+    showToast(res.message, 'success');
+    await syncDataFromBackend();
+    await fetchHabitaciones();
+  } catch (err) {
+    showToast(err.message, 'error');
+    return;
+  }
+  
   switchAdminTab('reservas', document.getElementById('tab-reservas'));
 };
 
-// =================== CRUD USUARIOS ===================
-window.adminEliminarUsuario = function(userId) {
+// =================== CRUD USUARIOS (SQL SERVER DIRECTO) ===================
+window.adminEliminarUsuario = async function(userId) {
   if (!confirm('¿Eliminar este usuario? Sus reservas no se eliminarán.')) return;
-  setUsuarios(getUsuarios().filter(u => String(u.id) !== String(userId)));
-  showToast('Usuario eliminado.', 'info');
+  
+  try {
+    const res = await apiCall(`/usuarios/${userId}`, { method: 'DELETE' });
+    showToast(res.message, 'success');
+    await syncDataFromBackend();
+  } catch (err) {
+    showToast(err.message, 'error');
+    return;
+  }
+  
   switchAdminTab('usuarios', document.getElementById('tab-usuarios'));
 };
 
 window.formNuevoUsuario = function() {
-  // Eliminar formulario anterior si existe
   document.getElementById('userForm')?.remove();
   const c = document.getElementById('adminTabContent');
   c.insertAdjacentHTML('afterbegin', `
@@ -291,18 +323,25 @@ window.formNuevoUsuario = function() {
     </div>`);
 };
 
-window.adminCrearUsuario = function() {
+window.adminCrearUsuario = async function() {
   const nombre = document.getElementById('fnNombre')?.value.trim();
   const email  = document.getElementById('fnEmail')?.value.trim();
   const pass   = document.getElementById('fnPass')?.value;
   if (!nombre || !email || !pass) { showToast('Completa todos los campos.', 'warning'); return; }
   if (pass.length < 8) { showToast('Contraseña mínimo 8 caracteres.', 'error'); return; }
-  const usuarios = getUsuarios();
-  if (usuarios.find(u => u.email.toLowerCase() === email.toLowerCase()))  { showToast('Correo ya registrado.', 'warning'); return; }
-  if (usuarios.find(u => u.nombre.toLowerCase() === nombre.toLowerCase())) { showToast('Usuario ya existe.', 'warning'); return; }
-  usuarios.push({ id: Date.now(), nombre, email, password: pass, fechaRegistro: new Date().toISOString() });
-  setUsuarios(usuarios);
-  showToast(`Usuario "${nombre}" creado exitosamente.`, 'success');
+  
+  try {
+    const res = await apiCall('/usuarios', {
+      method: 'POST',
+      body: JSON.stringify({ nombre, email, password: pass })
+    });
+    showToast(res.message, 'success');
+    await syncDataFromBackend();
+  } catch (err) {
+    showToast(err.message, 'error');
+    return;
+  }
+  
   switchAdminTab('usuarios', document.getElementById('tab-usuarios'));
 };
 
@@ -326,27 +365,35 @@ window.formEditarUsuario = function(userId) {
     </div>`);
 };
 
-window.adminGuardarEdicion = function(userId) {
+window.adminGuardarEdicion = async function(userId) {
   const nombre = document.getElementById('feNombre')?.value.trim();
   const email  = document.getElementById('feEmail')?.value.trim();
   const pass   = document.getElementById('fePass')?.value;
   if (!nombre || !email) { showToast('Nombre y email son obligatorios.', 'warning'); return; }
   if (pass && pass.length < 8) { showToast('Contraseña mínimo 8 caracteres.', 'error'); return; }
-  const usuarios = getUsuarios();
-  const idx      = usuarios.findIndex(u => String(u.id) === String(userId));
-  if (idx === -1) return;
-  usuarios[idx].nombre = nombre;
-  usuarios[idx].email  = email;
-  if (pass && pass.length >= 8) usuarios[idx].password = pass;
-  setUsuarios(usuarios);
-  showToast(`Usuario "${nombre}" actualizado.`, 'success');
+  
+  try {
+    const res = await apiCall(`/usuarios/${userId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ nombre, email, password: pass || undefined })
+    });
+    showToast(res.message, 'success');
+    await syncDataFromBackend();
+  } catch (err) {
+    showToast(err.message, 'error');
+    return;
+  }
+  
   switchAdminTab('usuarios', document.getElementById('tab-usuarios'));
 };
 
 // =================== INICIALIZACIÓN ===================
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   initData();
-  reconciliarDisponibilidad();
+  
+  // 📡 Conectar a SQL Server y sincronizar datos del panel de administración
+  await initBackendConnection();
+
   renderAdminPanel();
 
   // Botón cerrar sesión

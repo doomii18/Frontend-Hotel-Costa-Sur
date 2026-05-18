@@ -1,44 +1,94 @@
 // ================================================================
 //  data.js  — Capa de datos compartida entre usuario y admin
-//  Hotel Costa Sur
+//  Hotel Costa Sur - Integración Exclusiva con SQL Server
 // ================================================================
 
 // =================== DATOS DE HABITACIONES ===================
-const habitaciones = [
-  { id: 1,  nombre: "Habitación 1",  tipo: "Dos camas",                  categoria: "estandar",  precio: 500,  caracteristicas: ["2 camas, Matrimonial e Individual", "Baño privado"],              disponible: true,  televisor: false, aire: false },
-  { id: 2,  nombre: "Habitación 2",  tipo: "Dos camas",                  categoria: "estandar",  precio: 500,  caracteristicas: ["2 camas, Matrimonial e Individual", "Baño privado"],              disponible: true,  televisor: false, aire: false },
-  { id: 3,  nombre: "Habitación 3",  tipo: "Matrimonial",                categoria: "estandar",  precio: 400,  caracteristicas: ["Cama matrimonial", "Baño privado"],                              disponible: true,  televisor: false, aire: false },
-  { id: 4,  nombre: "Habitación 4",  tipo: "Dos camas",                  categoria: "estandar",  precio: 500,  caracteristicas: ["2 camas Individuales", "Baño privado"],                          disponible: true,  televisor: false, aire: false },
-  { id: 5,  nombre: "Habitación 5",  tipo: "Matrimonial",                categoria: "estandar",  precio: 400,  caracteristicas: ["Cama matrimonial", "Baño privado"],                              disponible: true,  televisor: false, aire: false },
-  { id: 6,  nombre: "Habitación 6",  tipo: "Matrimonial",                categoria: "estandar",  precio: 400,  caracteristicas: ["Cama matrimonial", "Baño privado"],                              disponible: true,  televisor: false, aire: false },
-  { id: 7,  nombre: "Habitación 7",  tipo: "Dos camas con TV",           categoria: "familiares",precio: 550,  caracteristicas: ["2 camas Individuales", "Baño privado", "Televisor"],             disponible: true,  televisor: true,  aire: false },
-  { id: 8,  nombre: "Habitación 8",  tipo: "Dos camas con TV",           categoria: "familiares",precio: 550,  caracteristicas: ["2 camas Individuales", "Baño privado", "Televisor"],             disponible: true,  televisor: true,  aire: false },
-  { id: 9,  nombre: "Habitación 9",  tipo: "Matrimonial con TV",         categoria: "estandar",  precio: 450,  caracteristicas: ["Cama matrimonial", "Baño privado", "Televisor"],                 disponible: true,  televisor: true,  aire: false },
-  { id: 10, nombre: "Habitación 10", tipo: "Matrimonial con TV",         categoria: "estandar",  precio: 450,  caracteristicas: ["Cama matrimonial", "Baño privado", "Televisor"],                 disponible: true,  televisor: true,  aire: false },
-  { id: 11, nombre: "Habitación 11", tipo: "Matrimonial con TV",         categoria: "estandar",  precio: 450,  caracteristicas: ["Cama matrimonial", "Baño privado", "Televisor"],                 disponible: true,  televisor: true,  aire: false },
-  { id: 12, nombre: "Habitación 12", tipo: "Matrimonial con TV",         categoria: "estandar",  precio: 450,  caracteristicas: ["Cama matrimonial", "Baño privado", "Televisor"],                 disponible: true,  televisor: true,  aire: false },
-  { id: 13, nombre: "Habitación 13", tipo: "Matrimonial con TV",         categoria: "estandar",  precio: 450,  caracteristicas: ["Cama matrimonial", "Baño privado", "Televisor"],                 disponible: true,  televisor: true,  aire: false },
-  { id: 14, nombre: "Habitación 14", tipo: "Matrimonial con TV",         categoria: "estandar",  precio: 450,  caracteristicas: ["Cama matrimonial", "Baño privado", "Televisor"],                 disponible: true,  televisor: true,  aire: false },
-  { id: 15, nombre: "Habitación 15", tipo: "Matrimonial",                categoria: "estandar",  precio: 400,  caracteristicas: ["Cama matrimonial", "Baño privado"],                              disponible: true,  televisor: false, aire: false },
-  { id: 16, nombre: "Habitación 16", tipo: "Doble cama sin TV",          categoria: "estandar",  precio: 500,  caracteristicas: ["2 camas Individuales", "Baño privado"],                          disponible: true,  televisor: false, aire: false },
-  { id: 17, nombre: "Habitación 17", tipo: "Matrimonial",                categoria: "estandar",  precio: 400,  caracteristicas: ["Cama matrimonial", "Baño privado"],                              disponible: true,  televisor: false, aire: false },
-  { id: 18, nombre: "Habitación 18", tipo: "Matrimonial",                categoria: "estandar",  precio: 400,  caracteristicas: ["Cama matrimonial", "Baño privado"],                              disponible: true,  televisor: false, aire: false },
-  { id: 19, nombre: "Habitación 19", tipo: "Dos camas matrimoniales",    categoria: "familiares",precio: 700,  caracteristicas: ["2 camas matrimoniales", "Baño privado"],                         disponible: true,  televisor: false, aire: false },
-  { id: 20, nombre: "Habitación 20", tipo: "Cuatro camas",               categoria: "familiares",precio: 900,  caracteristicas: ["4 camas individuales", "Baño privado"],                          disponible: true,  televisor: false, aire: false },
-  { id: 21, nombre: "Habitación 21", tipo: "Triple cama",                categoria: "familiares",precio: 700,  caracteristicas: ["3 camas individuales", "Baño privado"],                          disponible: true,  televisor: false, aire: false },
-  { id: 22, nombre: "Habitación 22", tipo: "Doble cama con TV",          categoria: "familiares",precio: 550,  caracteristicas: ["2 camas Individuales", "Baño privado", "Televisor"],             disponible: true,  televisor: true,  aire: false },
-  { id: 23, nombre: "Habitación 23", tipo: "Cama Matrimonial",           categoria: "aire",      precio: 1100, caracteristicas: ["Cama Queen", "Baño privado", "Aire Acondicionado"],              disponible: true,  televisor: true,  aire: true  },
-  { id: 24, nombre: "Habitación 24", tipo: "Cama Matrimonial",           categoria: "aire",      precio: 1100, caracteristicas: ["Cama Queen", "Baño privado", "Aire Acondicionado"],              disponible: false, televisor: true,  aire: true  },
-  { id: 25, nombre: "Habitación 25", tipo: "Cama Matrimonial",           categoria: "aire",      precio: 1100, caracteristicas: ["Cama Queen", "Baño privado", "Aire Acondicionado"],              disponible: true,  televisor: true,  aire: true  }
-];
+let habitaciones = []; // Se cargará obligatoriamente desde SQL Server
 
-// =================== ADMIN CONFIG ===================
+// =================== CONFIGURACIÓN DE CONEXIÓN BACKEND ===================
+const API_URL = 'http://localhost:5000/api';
+let reservasLocales = [];
+let usuariosLocales = [];
+
 const ADMIN_USER = 'HCS-ADMINISTRADOR';
-const ADMIN_PASS = '2026HOTELCOSTASUR';
 
 function isAdmin() {
   const u = getUsuarioActual();
   return u && u.rol === 'admin';
+}
+
+// Helper para hacer peticiones HTTP al Backend automáticamente incluyendo el Token JWT
+async function apiCall(endpoint, options = {}) {
+  const token = localStorage.getItem('token');
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(options.headers || {})
+  };
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_URL}${endpoint}`, {
+    ...options,
+    headers
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || `Error del servidor (${response.status})`);
+  }
+
+  return response.json();
+}
+
+// Inicialización: Conecta a SQL Server cargando el catálogo de habitaciones
+async function initBackendConnection() {
+  try {
+    console.log('📡 Intentando conectar con el servidor SQL Server a través del backend...');
+    
+    // Cargar habitaciones reales de la base de datos SQL Server
+    await fetchHabitaciones();
+    
+    // Si el usuario ya estaba logueado, sincronizar sus reservas y datos
+    const currentUser = getUsuarioActual();
+    if (currentUser) {
+      await syncDataFromBackend();
+    }
+    
+    console.log('🔌 Conectado exitosamente al Servidor SQL Server.');
+  } catch (err) {
+    console.error('💥 Error de conexión al backend/SQL Server:', err.message);
+    showToast('No se pudo conectar al servidor SQL Server. Asegúrate de que el backend esté encendido.', 'error');
+  }
+}
+
+// Sincroniza reservas y usuarios desde la BD real de SQL Server
+async function syncDataFromBackend() {
+  try {
+    // Cargar mis reservas / todas las reservas (según rol)
+    const res = await apiCall(isAdmin() ? '/reservas' : '/reservas/mis-reservas');
+    reservasLocales = res;
+
+    // Si es administrador, también cargar los usuarios
+    if (isAdmin()) {
+      const users = await apiCall('/usuarios');
+      usuariosLocales = users;
+    }
+  } catch (err) {
+    console.error('Error al sincronizar datos desde SQL Server:', err.message);
+  }
+}
+
+// Carga las habitaciones directamente de SQL Server
+async function fetchHabitaciones() {
+  const data = await apiCall('/habitaciones');
+  if (Array.isArray(data)) {
+    habitaciones.length = 0;
+    data.forEach(h => habitaciones.push(h));
+    console.log('🏨 Habitaciones cargadas desde SQL Server:', habitaciones.length);
+  }
 }
 
 // =================== TOAST SYSTEM ===================
@@ -66,22 +116,32 @@ const toastStyle = document.createElement('style');
 toastStyle.textContent = '@keyframes slideInToast{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}';
 document.head.appendChild(toastStyle);
 
-// =================== DATA LAYER (localStorage) ===================
+// =================== DATA LAYER (Sesiones locales de usuario) ===================
 function initData() {
-  if (!localStorage.getItem('usuarios'))      localStorage.setItem('usuarios',      JSON.stringify([]));
-  if (!localStorage.getItem('reservas'))      localStorage.setItem('reservas',      JSON.stringify([]));
-  if (!localStorage.getItem('usuarioActual')) localStorage.setItem('usuarioActual', JSON.stringify(null));
+  if (!localStorage.getItem('usuarioActual')) {
+    localStorage.setItem('usuarioActual', JSON.stringify(null));
+  }
 }
-function getUsuarioActual() { return JSON.parse(localStorage.getItem('usuarioActual')); }
-function setUsuarioActual(usuario) { localStorage.setItem('usuarioActual', JSON.stringify(usuario)); }
-function getUsuarios() { return JSON.parse(localStorage.getItem('usuarios')); }
-function setUsuarios(usuarios) { localStorage.setItem('usuarios', JSON.stringify(usuarios)); }
-function getReservas() { return JSON.parse(localStorage.getItem('reservas')); }
-function setReservas(reservas) { localStorage.setItem('reservas', JSON.stringify(reservas)); }
 
-// =================== AUTH ===================
-function registrarUsuario(datos) {
-  const usuarios = getUsuarios();
+function getUsuarioActual() {
+  return JSON.parse(localStorage.getItem('usuarioActual'));
+}
+
+function setUsuarioActual(usuario) {
+  localStorage.setItem('usuarioActual', JSON.stringify(usuario));
+}
+
+function getUsuarios() {
+  return usuariosLocales;
+}
+
+function getReservas() {
+  return reservasLocales;
+}
+
+// =================== WORKFLOWS DE AUTENTICACIÓN (SQL SERVER DIRECTO) ===================
+
+async function registrarUsuario(datos) {
   if (!datos.nombre || !datos.email || !datos.password) {
     showToast('Completa todos los campos.', 'warning'); return false;
   }
@@ -92,57 +152,57 @@ function registrarUsuario(datos) {
   if (!emailRegex.test(datos.email)) {
     showToast('Ingresa un correo electrónico válido.', 'error'); return false;
   }
-  if (usuarios.find(u => u.email.toLowerCase() === datos.email.toLowerCase())) {
-    showToast('Este correo ya está registrado.', 'warning'); return false;
+
+  try {
+    const res = await apiCall('/usuarios/registro', {
+      method: 'POST',
+      body: JSON.stringify(datos)
+    });
+    showToast(res.message, 'success');
+    return true;
+  } catch (err) {
+    showToast(err.message, 'error');
+    return false;
   }
-  if (usuarios.find(u => u.nombre.toLowerCase() === datos.nombre.toLowerCase())) {
-    showToast('Este nombre de usuario ya existe. Elige otro.', 'warning'); return false;
-  }
-  const nuevoUsuario = { id: Date.now(), ...datos, fechaRegistro: new Date().toISOString() };
-  usuarios.push(nuevoUsuario);
-  setUsuarios(usuarios);
-  showToast('¡Cuenta creada exitosamente! Ya puedes iniciar sesión.', 'success');
-  return true;
 }
 
-function loginUsuario(nombre, password) {
+async function loginUsuario(nombre, password) {
   if (!nombre || !password) {
     showToast('Completa todos los campos.', 'warning'); return false;
   }
-  // Acceso de Administrador
-  if (nombre.trim().toUpperCase() === ADMIN_USER && password === ADMIN_PASS) {
-    const adminObj = { id: 'admin-hcs', nombre: ADMIN_USER, rol: 'admin' };
-    setUsuarioActual(adminObj);
-    showToast('Bienvenido, Administrador', 'success');
-    return 'admin';
-  }
-  // Acceso de huésped normal
-  const usuarios = getUsuarios();
-  const usuario  = usuarios.find(u => u.nombre.toLowerCase() === nombre.toLowerCase() && u.password === password);
-  if (usuario) {
-    setUsuarioActual(usuario);
-    showToast(`¡Bienvenido, ${usuario.nombre}!`, 'success');
-    return true;
-  } else {
-    showToast('Usuario o contraseña incorrectos. Verifica tus datos.', 'error');
+
+  try {
+    const res = await apiCall('/usuarios/login', {
+      method: 'POST',
+      body: JSON.stringify({ nombre, password })
+    });
+    
+    localStorage.setItem('token', res.token);
+    setUsuarioActual(res.user);
+    
+    // Sincronizar reservas y catálogo del usuario
+    await syncDataFromBackend();
+    
+    showToast(`¡Bienvenido, ${res.user.nombre}!`, 'success');
+    return res.user.rol === 'admin' ? 'admin' : true;
+  } catch (err) {
+    showToast(err.message, 'error');
     return false;
   }
 }
 
 function logoutUsuario() {
+  localStorage.removeItem('token');
   setUsuarioActual(null);
+  reservasLocales = [];
+  usuariosLocales = [];
   showToast('Has cerrado sesión correctamente.', 'info');
 }
 
-// =================== DISPONIBILIDAD ===================
+// =================== DISPONIBILIDAD Y CÁLCULOS ===================
 function reconciliarDisponibilidad() {
-  const reservas = getReservas();
-  habitaciones.forEach(h => {
-    const activa = reservas.find(r =>
-      r.habitacionId === h.id && (r.estado === 'pendiente' || r.estado === 'activo' || !r.estado)
-    );
-    h.disponible = !activa;
-  });
+  // En este modo, la disponibilidad la gestiona directamente el servidor SQL Server.
+  // Solo la reflejamos en el frontend de acuerdo al estado cargado.
 }
 
 function calcularDias(fechaIngreso, fechaSalida) {

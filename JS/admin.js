@@ -1,0 +1,362 @@
+// ================================================================
+//  admin.js  — Lógica exclusiva del panel de administrador
+//  Hotel Costa Sur  |  Depende de: data.js
+// ================================================================
+
+// ── Guardia: si no es admin, redirigir al inicio ──────────────
+(function adminGuard() {
+  const u = getUsuarioActual();
+  if (!u || u.rol !== 'admin') {
+    window.location.replace('Index.html');
+  }
+})();
+
+// =================== RENDER PANEL TABS ===================
+function renderAdminPanel() {
+  const root = document.getElementById('adminRoot');
+  if (!root) return;
+
+  root.innerHTML = `
+    <div class="adm-tabs" id="adminTabsBar">
+      <button class="adm-tab active"   id="tab-dashboard"    onclick="switchAdminTab('dashboard',   this)">📊 Dashboard</button>
+      <button class="adm-tab"          id="tab-habitaciones" onclick="switchAdminTab('habitaciones',this)">🏨 Habitaciones</button>
+      <button class="adm-tab"          id="tab-reservas"     onclick="switchAdminTab('reservas',    this)">📋 Reservas</button>
+      <button class="adm-tab"          id="tab-usuarios"     onclick="switchAdminTab('usuarios',    this)">👥 Usuarios</button>
+    </div>
+    <div id="adminTabContent" style="margin-top:1.5rem;"></div>`;
+
+  switchAdminTab('dashboard', document.getElementById('tab-dashboard'));
+}
+
+// =================== SWITCH TAB ===================
+window.switchAdminTab = function(tab, btn) {
+  document.querySelectorAll('.adm-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  const content  = document.getElementById('adminTabContent');
+  const reservas = getReservas();
+  const users    = getUsuarios();
+
+  // ── DASHBOARD ────────────────────────────────────────
+  if (tab === 'dashboard') {
+    const pendientes  = reservas.filter(r => !r.estado || r.estado === 'pendiente').length;
+    const activas     = reservas.filter(r => r.estado === 'activo').length;
+    const completadas = reservas.filter(r => r.estado === 'completado').length;
+    const libres      = habitaciones.filter(h => h.disponible).length;
+    const ingresos    = reservas
+      .filter(r => r.estado === 'completado')
+      .reduce((sum, r) => sum + (r.total || 0), 0);
+
+    content.innerHTML = `
+      <div class="adm-stats-grid">
+        <div class="adm-stat adm-stat--blue">
+          <i class="fas fa-users adm-stat__icon"></i>
+          <div class="adm-num">${users.length}</div>
+          <div class="adm-lbl">Usuarios registrados</div>
+        </div>
+        <div class="adm-stat adm-stat--gray">
+          <i class="fas fa-calendar-check adm-stat__icon"></i>
+          <div class="adm-num">${reservas.length}</div>
+          <div class="adm-lbl">Reservas totales</div>
+        </div>
+        <div class="adm-stat adm-stat--orange">
+          <i class="fas fa-clock adm-stat__icon"></i>
+          <div class="adm-num">${pendientes}</div>
+          <div class="adm-lbl">Pendientes de llegada</div>
+        </div>
+        <div class="adm-stat adm-stat--green">
+          <i class="fas fa-door-open adm-stat__icon"></i>
+          <div class="adm-num">${activas}</div>
+          <div class="adm-lbl">Huéspedes activos</div>
+        </div>
+        <div class="adm-stat adm-stat--purple">
+          <i class="fas fa-check-double adm-stat__icon"></i>
+          <div class="adm-num">${completadas}</div>
+          <div class="adm-lbl">Completadas</div>
+        </div>
+        <div class="adm-stat adm-stat--teal">
+          <i class="fas fa-bed adm-stat__icon"></i>
+          <div class="adm-num">${libres}</div>
+          <div class="adm-lbl">Habitaciones libres</div>
+        </div>
+        <div class="adm-stat adm-stat--gold" style="grid-column: span 2;">
+          <i class="fas fa-coins adm-stat__icon"></i>
+          <div class="adm-num">C$${ingresos.toLocaleString('es-NI')}</div>
+          <div class="adm-lbl">Ingresos confirmados</div>
+        </div>
+      </div>
+      <p class="adm-hint">Usa las pestañas superiores para gestionar habitaciones, reservas y usuarios.</p>`;
+
+  // ── HABITACIONES ─────────────────────────────────────
+  } else if (tab === 'habitaciones') {
+    reconciliarDisponibilidad();
+    content.innerHTML = `
+      <div class="adm-rooms-grid">${
+        habitaciones.map(h => {
+          const r      = reservas.find(r => r.habitacionId === h.id && (r.estado === 'pendiente' || r.estado === 'activo' || !r.estado));
+          const estado = r ? (r.estado === 'activo' ? 'activo' : 'pendiente') : 'libre';
+          const colMap = { libre: '#00C853', activo: '#2196F3', pendiente: '#FF9800' };
+          const lblMap = { libre: '✓ Libre', activo: '🔑 Ocupado', pendiente: '📅 Reservado' };
+          const col    = colMap[estado];
+          const lbl    = lblMap[estado];
+          return `
+            <div class="adm-room-card" style="border-color:${col}40;">
+              <div class="adm-room-card__header">
+                <strong>${h.nombre}</strong>
+                <span class="adm-badge" style="background:${col}20;color:${col};">${lbl}</span>
+              </div>
+              <div class="adm-room-card__sub">${h.tipo} · C$${h.precio}/noche</div>
+              ${r ? `
+                <div class="adm-room-card__guest">
+                  <strong>Huésped:</strong> ${r.nombres} ${r.apellidos}<br>
+                  <strong>Entrada:</strong> ${r.fechaIngreso} &nbsp;·&nbsp; <strong>Salida:</strong> ${r.fechaSalida}
+                </div>
+                ${estado === 'pendiente' ? `<button onclick="adminCheckIn(${r.id})" class="adm-btn adm-btn--green">✅ Check-in · Confirmar pago</button>` : ''}
+                ${estado === 'activo'    ? `<button onclick="adminCheckOut(${r.id})" class="adm-btn adm-btn--blue">🚪 Check-out · Liberar</button>` : ''}
+              ` : `<div class="adm-room-card__free">Disponible para reservar</div>`}
+            </div>`;
+        }).join('')
+      }</div>`;
+
+  // ── RESERVAS ──────────────────────────────────────────
+  } else if (tab === 'reservas') {
+    content.innerHTML = `
+      <input type="text" id="searchRes"
+        placeholder="🔍 Buscar por huésped, habitación, cédula…"
+        oninput="filtrarTablaReservas(this.value)"
+        class="adm-search-input">
+      <div id="resTable">${buildReservasTable(reservas)}</div>`;
+
+  // ── USUARIOS ──────────────────────────────────────────
+  } else if (tab === 'usuarios') {
+    content.innerHTML = `
+      <div class="adm-toolbar">
+        <input type="text" id="searchUsr"
+          placeholder="🔍 Buscar usuario…"
+          oninput="filtrarTablaUsuarios(this.value)"
+          class="adm-search-input" style="flex:1;">
+        <button onclick="formNuevoUsuario()" class="adm-btn adm-btn--primary">+ Crear usuario</button>
+      </div>
+      <div id="usrTable">${buildUsuariosTable(users)}</div>`;
+  }
+};
+
+// =================== HELPERS DE TABLA ===================
+function buildReservasTable(reservas) {
+  if (!reservas.length) return '<p class="adm-empty">No hay reservas registradas.</p>';
+  const estLabel = e => e === 'activo' ? '🔑 Activo' : e === 'completado' ? '✅ Completado' : '📅 Pendiente';
+  const estCol   = e => e === 'activo' ? '#2196F3' : e === 'completado' ? '#00C853' : '#FF9800';
+  return `
+    <div class="adm-table-wrap">
+      <table class="adm-table">
+        <thead><tr>
+          <th>Habitación</th><th>Huésped</th><th>Cédula / Pasaporte</th>
+          <th>Entrada</th><th>Salida</th><th>Días</th><th>Total</th><th>Estado</th><th>Acciones</th>
+        </tr></thead>
+        <tbody>${reservas.map(r => `
+          <tr>
+            <td><strong>${r.habitacionNombre}</strong></td>
+            <td>${r.nombres} ${r.apellidos}<br><small style="color:#888;">${r.usuarioNombre}</small></td>
+            <td style="font-size:.82rem;">${r.cedula || r.pasaporte || '—'}</td>
+            <td>${r.fechaIngreso}</td>
+            <td>${r.fechaSalida}</td>
+            <td>${r.dias}</td>
+            <td><strong>C$${r.total}</strong></td>
+            <td>
+              <span class="adm-badge"
+                style="background:${estCol(r.estado)}20;color:${estCol(r.estado)};">
+                ${estLabel(r.estado)}
+              </span>
+            </td>
+            <td>
+              <button onclick="adminEliminarReserva(${r.id})"
+                class="adm-btn adm-btn--danger" style="font-size:.78rem;">
+                🗑 Eliminar
+              </button>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function buildUsuariosTable(users) {
+  if (!users.length) return '<p class="adm-empty">No hay usuarios registrados.</p>';
+  return `
+    <div class="adm-table-wrap">
+      <table class="adm-table">
+        <thead><tr>
+          <th>Usuario</th><th>Email</th><th>Fecha registro</th><th>Reservas</th><th>Acciones</th>
+        </tr></thead>
+        <tbody>${users.map(u => {
+          const numRes = getReservas().filter(r => r.usuarioId === u.id).length;
+          return `
+          <tr>
+            <td><strong>${u.nombre}</strong></td>
+            <td>${u.email}</td>
+            <td style="font-size:.82rem;">${new Date(u.fechaRegistro).toLocaleDateString('es-NI')}</td>
+            <td style="text-align:center;">${numRes}</td>
+            <td style="display:flex;gap:.4rem;flex-wrap:wrap;">
+              <button onclick="formEditarUsuario('${u.id}')"  class="adm-btn adm-btn--primary" style="font-size:.78rem;">✏️ Editar</button>
+              <button onclick="adminEliminarUsuario('${u.id}')" class="adm-btn adm-btn--danger" style="font-size:.78rem;">🗑 Eliminar</button>
+            </td>
+          </tr>`;
+        }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// =================== FILTROS EN VIVO ===================
+window.filtrarTablaReservas = function(q) {
+  const term     = q.toLowerCase();
+  const filtered = getReservas().filter(r =>
+    `${r.nombres} ${r.apellidos} ${r.habitacionNombre} ${r.cedula || ''} ${r.pasaporte || ''}`.toLowerCase().includes(term)
+  );
+  document.getElementById('resTable').innerHTML = buildReservasTable(filtered);
+};
+
+window.filtrarTablaUsuarios = function(q) {
+  const term     = q.toLowerCase();
+  const filtered = getUsuarios().filter(u =>
+    `${u.nombre} ${u.email}`.toLowerCase().includes(term)
+  );
+  document.getElementById('usrTable').innerHTML = buildUsuariosTable(filtered);
+};
+
+// =================== CHECK-IN / CHECK-OUT ===================
+window.adminCheckIn = function(reservaId) {
+  if (!confirm('¿Confirmar que el huésped pagó y realizó el check-in?')) return;
+  const reservas = getReservas();
+  const idx      = reservas.findIndex(r => r.id === reservaId);
+  if (idx === -1) { showToast('Reserva no encontrada.', 'error'); return; }
+  reservas[idx].estado      = 'activo';
+  reservas[idx].fechaCheckIn = new Date().toISOString();
+  setReservas(reservas);
+  showToast(`✅ Check-in confirmado para ${reservas[idx].nombres} ${reservas[idx].apellidos}`, 'success');
+  switchAdminTab('habitaciones', document.getElementById('tab-habitaciones'));
+};
+
+window.adminCheckOut = function(reservaId) {
+  if (!confirm('¿Confirmar check-out y liberar la habitación?')) return;
+  const reservas = getReservas();
+  const idx      = reservas.findIndex(r => r.id === reservaId);
+  if (idx === -1) { showToast('Reserva no encontrada.', 'error'); return; }
+  reservas[idx].estado       = 'completado';
+  reservas[idx].fechaCheckOut = new Date().toISOString();
+  setReservas(reservas);
+  const hab = habitaciones.find(h => h.id === reservas[idx].habitacionId);
+  if (hab) hab.disponible = true;
+  showToast(`🚪 Check-out realizado. Habitación ${reservas[idx].habitacionNombre} liberada.`, 'info');
+  switchAdminTab('habitaciones', document.getElementById('tab-habitaciones'));
+};
+
+// =================== CRUD RESERVAS ===================
+window.adminEliminarReserva = function(reservaId) {
+  if (!confirm('¿Eliminar esta reserva definitivamente?')) return;
+  let reservas = getReservas();
+  const r      = reservas.find(r => r.id === reservaId);
+  if (!r) return;
+  const hab = habitaciones.find(h => h.id === r.habitacionId);
+  if (hab && r.estado !== 'completado') hab.disponible = true;
+  setReservas(reservas.filter(r => r.id !== reservaId));
+  showToast('Reserva eliminada.', 'info');
+  switchAdminTab('reservas', document.getElementById('tab-reservas'));
+};
+
+// =================== CRUD USUARIOS ===================
+window.adminEliminarUsuario = function(userId) {
+  if (!confirm('¿Eliminar este usuario? Sus reservas no se eliminarán.')) return;
+  setUsuarios(getUsuarios().filter(u => String(u.id) !== String(userId)));
+  showToast('Usuario eliminado.', 'info');
+  switchAdminTab('usuarios', document.getElementById('tab-usuarios'));
+};
+
+window.formNuevoUsuario = function() {
+  // Eliminar formulario anterior si existe
+  document.getElementById('userForm')?.remove();
+  const c = document.getElementById('adminTabContent');
+  c.insertAdjacentHTML('afterbegin', `
+    <div id="userForm" class="adm-form-card adm-form-card--blue">
+      <strong class="adm-form-title">➕ Nuevo Usuario</strong>
+      <div class="adm-form-grid">
+        <input id="fnNombre" placeholder="Nombre de usuario" class="adm-input">
+        <input id="fnEmail"  type="email" placeholder="Correo electrónico" class="adm-input">
+        <input id="fnPass"   type="password" placeholder="Contraseña (mín. 8 chars)" class="adm-input">
+      </div>
+      <div class="adm-form-actions">
+        <button onclick="adminCrearUsuario()" class="adm-btn adm-btn--primary">Crear</button>
+        <button onclick="document.getElementById('userForm').remove()" class="adm-btn adm-btn--ghost">Cancelar</button>
+      </div>
+    </div>`);
+};
+
+window.adminCrearUsuario = function() {
+  const nombre = document.getElementById('fnNombre')?.value.trim();
+  const email  = document.getElementById('fnEmail')?.value.trim();
+  const pass   = document.getElementById('fnPass')?.value;
+  if (!nombre || !email || !pass) { showToast('Completa todos los campos.', 'warning'); return; }
+  if (pass.length < 8) { showToast('Contraseña mínimo 8 caracteres.', 'error'); return; }
+  const usuarios = getUsuarios();
+  if (usuarios.find(u => u.email.toLowerCase() === email.toLowerCase()))  { showToast('Correo ya registrado.', 'warning'); return; }
+  if (usuarios.find(u => u.nombre.toLowerCase() === nombre.toLowerCase())) { showToast('Usuario ya existe.', 'warning'); return; }
+  usuarios.push({ id: Date.now(), nombre, email, password: pass, fechaRegistro: new Date().toISOString() });
+  setUsuarios(usuarios);
+  showToast(`Usuario "${nombre}" creado exitosamente.`, 'success');
+  switchAdminTab('usuarios', document.getElementById('tab-usuarios'));
+};
+
+window.formEditarUsuario = function(userId) {
+  document.getElementById('userEditForm')?.remove();
+  const u = getUsuarios().find(u => String(u.id) === String(userId));
+  if (!u) return;
+  const c = document.getElementById('adminTabContent');
+  c.insertAdjacentHTML('afterbegin', `
+    <div id="userEditForm" class="adm-form-card adm-form-card--yellow">
+      <strong class="adm-form-title">✏️ Editar: ${u.nombre}</strong>
+      <div class="adm-form-grid">
+        <input id="feNombre" value="${u.nombre}" placeholder="Nombre" class="adm-input">
+        <input id="feEmail"  value="${u.email}" type="email" placeholder="Email" class="adm-input">
+        <input id="fePass"   type="password" placeholder="Nueva contraseña (dejar vacío para no cambiar)" class="adm-input">
+      </div>
+      <div class="adm-form-actions">
+        <button onclick="adminGuardarEdicion('${userId}')" class="adm-btn adm-btn--warning">Guardar</button>
+        <button onclick="document.getElementById('userEditForm').remove()" class="adm-btn adm-btn--ghost">Cancelar</button>
+      </div>
+    </div>`);
+};
+
+window.adminGuardarEdicion = function(userId) {
+  const nombre = document.getElementById('feNombre')?.value.trim();
+  const email  = document.getElementById('feEmail')?.value.trim();
+  const pass   = document.getElementById('fePass')?.value;
+  if (!nombre || !email) { showToast('Nombre y email son obligatorios.', 'warning'); return; }
+  if (pass && pass.length < 8) { showToast('Contraseña mínimo 8 caracteres.', 'error'); return; }
+  const usuarios = getUsuarios();
+  const idx      = usuarios.findIndex(u => String(u.id) === String(userId));
+  if (idx === -1) return;
+  usuarios[idx].nombre = nombre;
+  usuarios[idx].email  = email;
+  if (pass && pass.length >= 8) usuarios[idx].password = pass;
+  setUsuarios(usuarios);
+  showToast(`Usuario "${nombre}" actualizado.`, 'success');
+  switchAdminTab('usuarios', document.getElementById('tab-usuarios'));
+};
+
+// =================== INICIALIZACIÓN ===================
+document.addEventListener('DOMContentLoaded', () => {
+  initData();
+  reconciliarDisponibilidad();
+  renderAdminPanel();
+
+  // Botón cerrar sesión
+  document.getElementById('adminLogoutBtn')?.addEventListener('click', () => {
+    logoutUsuario();
+    window.location.replace('Index.html');
+  });
+
+  // Botón volver a la web
+  document.getElementById('adminHomeBtn')?.addEventListener('click', () => {
+    window.location.href = 'Index.html';
+  });
+});

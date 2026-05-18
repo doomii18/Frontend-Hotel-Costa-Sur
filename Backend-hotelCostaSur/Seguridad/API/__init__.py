@@ -1,1 +1,0 @@
-# Seguridad API initializer

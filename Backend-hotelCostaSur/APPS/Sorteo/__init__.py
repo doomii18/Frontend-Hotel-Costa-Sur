@@ -1,1 +1,0 @@
-# Sorteo app package initializer

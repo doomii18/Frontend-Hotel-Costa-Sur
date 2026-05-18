@@ -3,7 +3,6 @@
 -- Proyecto: Hotel Costa Sur - Estructura T-SQL Oficial
 -- =======================================================
 
--- 1. Crear la Base de Datos (Limpieza Completa)
 USE master;
 GO
 IF EXISTS (SELECT name FROM sys.databases WHERE name = 'HotelCostaSur')
@@ -17,7 +16,6 @@ GO
 USE HotelCostaSur;
 GO
 
--- 2. Eliminar tablas previas en orden inverso de llaves foráneas para evitar conflictos
 IF OBJECT_ID('dbo.participantes_sorteo', 'U') IS NOT NULL DROP TABLE dbo.participantes_sorteo;
 IF OBJECT_ID('dbo.reservas', 'U') IS NOT NULL DROP TABLE dbo.reservas;
 IF OBJECT_ID('dbo.habitaciones', 'U') IS NOT NULL DROP TABLE dbo.habitaciones;
@@ -25,7 +23,6 @@ IF OBJECT_ID('dbo.Categorias', 'U') IS NOT NULL DROP TABLE dbo.Categorias;
 IF OBJECT_ID('dbo.usuarios', 'U') IS NOT NULL DROP TABLE dbo.usuarios;
 GO
 
--- 3. Tabla de Usuarios
 CREATE TABLE usuarios (
     id_usuario INT IDENTITY(1,1) PRIMARY KEY,
     usuario NVARCHAR(50) UNIQUE NOT NULL,
@@ -36,21 +33,19 @@ CREATE TABLE usuarios (
 );
 GO
 
--- 4. Tabla de Categorías de Habitaciones
 CREATE TABLE Categorias (
     id_categoria INT PRIMARY KEY,
     NombreCategoria NVARCHAR(50) NOT NULL
 );
 GO
 
--- 5. Tabla de Habitaciones
 CREATE TABLE habitaciones (
     id_habitacion INT PRIMARY KEY,
     nombre NVARCHAR(50) NOT NULL,
     tipo NVARCHAR(50) NOT NULL,
     id_categoria INT NOT NULL,
     precio DECIMAL(10,2) NOT NULL,
-    caracteristicas NVARCHAR(MAX) NOT NULL, -- Guardaremos las características serializadas en un JSON Array
+    caracteristicas NVARCHAR(MAX) NOT NULL,
     disponible BIT DEFAULT 1,
     televisor BIT DEFAULT 0,
     aire BIT DEFAULT 0,
@@ -58,7 +53,6 @@ CREATE TABLE habitaciones (
 );
 GO
 
--- 6. Tabla de Reservas
 CREATE TABLE reservas (
     id_reserva INT IDENTITY(1,1) PRIMARY KEY,
     id_usuario INT NOT NULL,
@@ -86,7 +80,6 @@ CREATE TABLE reservas (
 );
 GO
 
--- 7. Tabla de Participantes en Sorteos
 CREATE TABLE participantes_sorteo (
     id_participante INT IDENTITY(1,1) PRIMARY KEY,
     nombres NVARCHAR(50) NOT NULL,

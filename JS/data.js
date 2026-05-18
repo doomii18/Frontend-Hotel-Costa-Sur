@@ -46,7 +46,7 @@ async function apiCall(endpoint, options = {}) {
 // Inicialización: Conecta a SQL Server cargando el catálogo de habitaciones
 async function initBackendConnection() {
   try {
-    console.log('📡 Intentando conectar con el servidor SQL Server a través del backend...');
+    console.log('Intentando conectar con el servidor SQL Server a través del backend...');
     
     // Cargar habitaciones reales de la base de datos SQL Server
     await fetchHabitaciones();
@@ -59,7 +59,7 @@ async function initBackendConnection() {
     
     console.log('🔌 Conectado exitosamente al Servidor SQL Server.');
   } catch (err) {
-    console.error('💥 Error de conexión al backend/SQL Server:', err.message);
+    console.error(' Error de conexión al backend/SQL Server:', err.message);
     showToast('No se pudo conectar al servidor SQL Server. Asegúrate de que el backend esté encendido.', 'error');
   }
 }

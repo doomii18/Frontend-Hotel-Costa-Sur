@@ -1,0 +1,10 @@
+# Node.js
+Backend-hotelCostaSur/node_modules/
+Backend-hotelCostaSur/.env
+
+# IDEs & System files
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+.DS_Store

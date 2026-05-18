@@ -7,7 +7,7 @@
 (function adminGuard() {
   const u = getUsuarioActual();
   if (!u || u.rol !== 'admin') {
-    window.location.replace('Index.html');
+    window.location.replace('index.html');
   }
 })();
 
@@ -399,11 +399,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Botón cerrar sesión
   document.getElementById('adminLogoutBtn')?.addEventListener('click', () => {
     logoutUsuario();
-    window.location.replace('Index.html');
+    window.location.replace('index.html');
   });
 
   // Botón volver a la web
   document.getElementById('adminHomeBtn')?.addEventListener('click', () => {
-    window.location.href = 'Index.html';
+    window.location.href = 'index.html';
   });
 });

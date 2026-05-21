@@ -36,8 +36,8 @@ function renderRooms(filter = "all") {
 
   let filtered = habitaciones;
   if (filter === "estandar")   filtered = habitaciones.filter(r => r.precio >= 400 && r.precio <= 500);
-  else if (filter === "familiares") filtered = habitaciones.filter(r => r.precio >= 550 && r.precio <= 900);
-  else if (filter === "aire")  filtered = habitaciones.filter(r => r.aire === true);
+  else if (filter === "familiar") filtered = habitaciones.filter(r => r.precio >= 550 && r.precio <= 900);
+  else if (filter === "premium")  filtered = habitaciones.filter(r => r.precio >= 1100);
 
   if (filtered.length === 0) {
     container.innerHTML = '<div style="text-align:center; padding:3rem;">🚫 No hay habitaciones en esta categoría</div>';

@@ -7,7 +7,7 @@
 let habitaciones = []; // Se cargará obligatoriamente desde SQL Server
 
 // =================== CONFIGURACIÓN DE CONEXIÓN BACKEND ===================
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'https://backend-hotelcostasur-production.up.railway.app/api';
 let reservasLocales = [];
 let usuariosLocales = [];
 

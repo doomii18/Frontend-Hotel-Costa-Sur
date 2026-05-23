@@ -204,12 +204,20 @@ async function crearReserva(reservaData) {
       method: 'POST',
       body: JSON.stringify(reservaData)
     });
-    showToast(res.message, 'success');
+    showToast(res.message || 'Reserva creada exitosamente', 'success');
     await syncDataFromBackend();
     await fetchHabitaciones();
   } catch (err) {
-    showToast(err.message, 'error');
-    return false;
+    if (err.message.includes('servidor') || err.message.includes('fetch') || err.message.includes('Failed') || err.message.includes('Problemas')) {
+      console.warn('Backend inactivo, guardando reserva localmente.');
+      reservaData.id = Date.now();
+      reservaData.estado = 'Pendiente';
+      reservasLocales.push(reservaData);
+      showToast('Reserva guardada localmente (modo offline)', 'success');
+    } else {
+      showToast(err.message, 'error');
+      return false;
+    }
   }
 
   const idText = reservaData.tipoDocumento === 'pasaporte'

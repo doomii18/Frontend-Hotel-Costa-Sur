@@ -1,6 +1,6 @@
 // ================================================================
 //  data.js  — Capa de datos compartida entre usuario y admin
-//  Hotel Costa Sur - Integración Exclusiva con SQL Server
+//  Hotel Costa Sur - Integración con Backend (PostgreSQL/SQL Server)
 // ================================================================
 
 // =================== DATOS DE HABITACIONES ===================
@@ -19,7 +19,7 @@ function isAdmin() {
 }
 
 // Helper para hacer peticiones HTTP al Backend automáticamente incluyendo el Token JWT
-async function apiCall(endpoint, options = {}) {
+async function apiCall(endpoint, options = {}, retries = 2) {
   const token = localStorage.getItem('token');
   const headers = {
     'Content-Type': 'application/json',
@@ -30,25 +30,45 @@ async function apiCall(endpoint, options = {}) {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    ...options,
-    headers
-  });
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error || `Error del servidor (${response.status})`);
+    const response = await fetch(`${API_URL}${endpoint}`, {
+      ...options,
+      headers,
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+
+    if (response.status === 401 || response.status === 403) {
+      logoutUsuario();
+      throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+    }
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `Error del servidor (${response.status})`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    if (retries > 0 && error.name !== 'AbortError' && !error.message.includes('Sesión expirada')) {
+      console.warn(`Reintentando petición a ${endpoint}... Quedan ${retries} intentos.`);
+      await new Promise(res => setTimeout(res, 1000));
+      return apiCall(endpoint, options, retries - 1);
+    }
+    throw error;
   }
-
-  return response.json();
 }
 
-// Inicialización: Conecta a SQL Server cargando el catálogo de habitaciones
+// Inicialización: Conecta al backend cargando el catálogo de habitaciones
 async function initBackendConnection() {
   try {
-    console.log('Intentando conectar con el servidor SQL Server a través del backend...');
+    console.log('Intentando conectar con el servidor backend...');
     
-    // Cargar habitaciones reales de la base de datos SQL Server
+    // Cargar habitaciones reales de la base de datos
     await fetchHabitaciones();
     
     // Si el usuario ya estaba logueado, sincronizar sus reservas y datos
@@ -57,14 +77,14 @@ async function initBackendConnection() {
       await syncDataFromBackend();
     }
     
-    console.log('🔌 Conectado exitosamente al Servidor SQL Server.');
+    console.log('🔌 Conectado exitosamente al Servidor.');
   } catch (err) {
-    console.error(' Error de conexión al backend/SQL Server:', err.message);
-    showToast('No se pudo conectar al servidor SQL Server. Asegúrate de que el backend esté encendido.', 'error');
+    console.error(' Error de conexión al backend:', err.message);
+    showToast('Problemas de conexión con el servidor principal. Funcionando en modo local.', 'warning');
   }
 }
 
-// Sincroniza reservas y usuarios desde la BD real de SQL Server
+// Sincroniza reservas y usuarios desde la BD real
 async function syncDataFromBackend() {
   try {
     // Cargar mis reservas / todas las reservas (según rol)
@@ -77,17 +97,51 @@ async function syncDataFromBackend() {
       usuariosLocales = users;
     }
   } catch (err) {
-    console.error('Error al sincronizar datos desde SQL Server:', err.message);
+    console.error('Error al sincronizar datos desde el backend:', err.message);
   }
 }
 
-// Carga las habitaciones directamente de SQL Server
+// Carga las habitaciones directamente del backend o fallback
+const habitacionesFallback = [
+  { id: 1, nombre: "Habitación 1", tipo: "Dos camas", categoria: "estandar", precio: 500, caracteristicas: ["2 camas, Matrimonial e Individual", "Baño privado"], disponible: true },
+  { id: 2, nombre: "Habitación 2", tipo: "Dos camas", categoria: "estandar", precio: 500, caracteristicas: ["2 camas, Matrimonial e Individual", "Baño privado"], disponible: true },
+  { id: 3, nombre: "Habitación 3", tipo: "Matrimonial", categoria: "estandar", precio: 400, caracteristicas: ["Cama matrimonial", "Baño privado"], disponible: true },
+  { id: 4, nombre: "Habitación 4", tipo: "Dos camas", categoria: "estandar", precio: 500, caracteristicas: ["2 camas Individuales", "Baño privado"], disponible: true },
+  { id: 5, nombre: "Habitación 5", tipo: "Matrimonial", categoria: "estandar", precio: 400, caracteristicas: ["Cama matrimonial", "Baño privado"], disponible: true },
+  { id: 6, nombre: "Habitación 6", tipo: "Matrimonial", categoria: "estandar", precio: 400, caracteristicas: ["Cama matrimonial", "Baño privado"], disponible: true },
+  { id: 7, nombre: "Habitación 7", tipo: "Dos camas con TV", categoria: "familiares", precio: 550, caracteristicas: ["2 camas Individuales", "Baño privado", "Televisor"], disponible: true },
+  { id: 8, nombre: "Habitación 8", tipo: "Dos camas con TV", categoria: "familiares", precio: 550, caracteristicas: ["2 camas Individuales", "Baño privado", "Televisor"], disponible: true },
+  { id: 9, nombre: "Habitación 9", tipo: "Matrimonial con TV", categoria: "estandar", precio: 450, caracteristicas: ["Cama matrimonial", "Baño privado", "Televisor"], disponible: true },
+  { id: 10, nombre: "Habitación 10", tipo: "Matrimonial con TV", categoria: "estandar", precio: 450, caracteristicas: ["Cama matrimonial", "Baño privado", "Televisor"], disponible: true },
+  { id: 11, nombre: "Habitación 11", tipo: "Matrimonial con TV", categoria: "estandar", precio: 450, caracteristicas: ["Cama matrimonial", "Baño privado", "Televisor"], disponible: true },
+  { id: 12, nombre: "Habitación 12", tipo: "Matrimonial con TV", categoria: "estandar", precio: 450, caracteristicas: ["Cama matrimonial", "Baño privado", "Televisor"], disponible: true },
+  { id: 13, nombre: "Habitación 13", tipo: "Matrimonial con TV", categoria: "estandar", precio: 450, caracteristicas: ["Cama matrimonial", "Baño privado", "Televisor"], disponible: true },
+  { id: 14, nombre: "Habitación 14", tipo: "Matrimonial con TV", categoria: "estandar", precio: 450, caracteristicas: ["Cama matrimonial", "Baño privado", "Televisor"], disponible: true },
+  { id: 15, nombre: "Habitación 15", tipo: "Matrimonial", categoria: "estandar", precio: 400, caracteristicas: ["Cama matrimonial", "Baño privado"], disponible: true },
+  { id: 16, nombre: "Habitación 16", tipo: "Doble cama sin TV", categoria: "estandar", precio: 500, caracteristicas: ["2 camas Individuales", "Baño privado"], disponible: true },
+  { id: 17, nombre: "Habitación 17", tipo: "Matrimonial", categoria: "estandar", precio: 400, caracteristicas: ["Cama matrimonial", "Baño privado"], disponible: true },
+  { id: 18, nombre: "Habitación 18", tipo: "Matrimonial", categoria: "estandar", precio: 400, caracteristicas: ["Cama matrimonial", "Baño privado"], disponible: true },
+  { id: 19, nombre: "Habitación 19", tipo: "Dos camas matrimoniales", categoria: "familiares", precio: 700, caracteristicas: ["2 camas matrimoniales", "Baño privado"], disponible: true },
+  { id: 20, nombre: "Habitación 20", tipo: "Cuatro camas", categoria: "familiares", precio: 900, caracteristicas: ["4 camas individuales", "Baño privado"], disponible: true },
+  { id: 21, nombre: "Habitación 21", tipo: "Triple cama", categoria: "familiares", precio: 700, caracteristicas: ["3 camas individuales", "Baño privado"], disponible: true },
+  { id: 22, nombre: "Habitación 22", tipo: "Doble cama con TV", categoria: "familiares", precio: 550, caracteristicas: ["2 camas Individuales", "Baño privado", "Televisor"], disponible: true },
+  { id: 23, nombre: "Habitación 23", tipo: "Cama Matrimonial", categoria: "aire", precio: 1100, caracteristicas: ["Cama Queen", "Baño privado", "Aire Acondicionado"], disponible: true },
+  { id: 24, nombre: "Habitación 24", tipo: "Cama Matrimonial", categoria: "aire", precio: 1100, caracteristicas: ["Cama Queen", "Baño privado", "Aire Acondicionado"], disponible: true },
+  { id: 25, nombre: "Habitación 25", tipo: "Cama Matrimonial", categoria: "aire", precio: 1100, caracteristicas: ["Cama Queen", "Baño privado", "Aire Acondicionado"], disponible: true }
+];
+
 async function fetchHabitaciones() {
-  const data = await apiCall('/habitaciones/');
-  if (Array.isArray(data)) {
+  try {
+    const data = await apiCall('/habitaciones/');
+    if (Array.isArray(data)) {
+      habitaciones.length = 0;
+      data.forEach(h => habitaciones.push(h));
+      console.log('🏨 Habitaciones cargadas desde el Backend:', habitaciones.length);
+    }
+  } catch (error) {
+    console.warn('Cargando habitaciones desde fallback local debido a error en API.');
     habitaciones.length = 0;
-    data.forEach(h => habitaciones.push(h));
-    console.log('🏨 Habitaciones cargadas desde SQL Server:', habitaciones.length);
+    habitacionesFallback.forEach(h => habitaciones.push(h));
   }
 }
 

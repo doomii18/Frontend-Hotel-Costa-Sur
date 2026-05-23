@@ -34,13 +34,18 @@ function renderRooms(filter = "all") {
   const container = document.getElementById('roomsContainer');
   if (!container) return;
 
+  if (habitaciones.length === 0) {
+    container.innerHTML = '<div style="text-align:center; padding:3rem; grid-column: 1 / -1;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #0056b3; margin-bottom: 1rem;"></i><br>Cargando habitaciones...</div>';
+    return;
+  }
+
   let filtered = habitaciones;
   if (filter === "estandar")   filtered = habitaciones.filter(r => r.precio >= 400 && r.precio <= 500);
   else if (filter === "familiar") filtered = habitaciones.filter(r => r.precio >= 550 && r.precio <= 900);
   else if (filter === "premium")  filtered = habitaciones.filter(r => r.precio >= 1100);
 
   if (filtered.length === 0) {
-    container.innerHTML = '<div style="text-align:center; padding:3rem;">🚫 No hay habitaciones en esta categoría</div>';
+    container.innerHTML = '<div style="text-align:center; padding:3rem; grid-column: 1 / -1;">🚫 No hay habitaciones en esta categoría</div>';
     return;
   }
 
@@ -139,13 +144,17 @@ document.addEventListener('click', function(e) {
 });
 
 // =================== MIS RESERVAS ===================
-function mostrarMisReservas() {
+async function mostrarMisReservas() {
   const usuario = getUsuarioActual();
   if (!usuario) { alert("Debes iniciar sesión."); mostrarPopup('loginPopup'); return; }
 
-  // Sincronizar y obtener reservas
-  const reservas  = getReservas();
   const container = document.getElementById('misReservasContent');
+  container.innerHTML = '<div style="text-align:center; padding:2rem;"><i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; color: #0056b3;"></i><br>Sincronizando reservas...</div>';
+  mostrarPopup('misReservasPopup');
+
+  // Sincronizar y obtener reservas
+  await syncDataFromBackend();
+  const reservas  = getReservas();
 
   if (reservas.length === 0) {
     container.innerHTML = '<p style="text-align:center; padding:2rem;">📭 No tienes reservas aún.</p>';
@@ -258,13 +267,21 @@ function initChatbot() {
 document.addEventListener('DOMContentLoaded', async () => {
   initData();
   
-  // 📡 Conectar a SQL Server y cargar habitaciones del backend
+  // 📡 Conectar al backend y cargar habitaciones
   await initBackendConnection();
 
   renderRooms("all");
   setupFilters();
   actualizarHeaderUsuario();
   initChatbot();
+
+  // Sincronización en background cada 60 segundos
+  setInterval(async () => {
+    await fetchHabitaciones();
+    if (!document.body.classList.contains('popup-open')) {
+      renderRooms(currentFilter);
+    }
+  }, 60000);
 
   // ── Registro ──────────────────────────────────────────
   document.getElementById('registroForm')?.addEventListener('submit', async (e) => {

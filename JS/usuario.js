@@ -171,7 +171,7 @@ window.cancelarReserva = async function(reservaId) {
   if (!confirm('¿Deseas cancelar esta reserva?')) return;
   
   try {
-    const res = await apiCall(`/reservas/${reservaId}`, { method: 'DELETE' });
+    const res = await apiCall(`/reservas/${reservaId}/`, { method: 'DELETE' });
     showToast(res.message, 'success');
     await syncDataFromBackend();
     await fetchHabitaciones();
@@ -191,7 +191,7 @@ async function crearReserva(reservaData) {
   if (!usuario) { showToast('Debes iniciar sesión para reservar.', 'warning'); return false; }
 
   try {
-    const res = await apiCall('/reservas', {
+    const res = await apiCall('/reservas/', {
       method: 'POST',
       body: JSON.stringify(reservaData)
     });
@@ -488,7 +488,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const leadData = { nombres, apellidos, email, telefono, departamento, sexo, edad: parseInt(edad) || 0, ocupacion };
 
       try {
-        const res = await apiCall('/sorteos', {
+        const res = await apiCall('/sorteos/', {
           method: 'POST',
           body: JSON.stringify(leadData)
         });

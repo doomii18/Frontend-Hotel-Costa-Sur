@@ -68,12 +68,12 @@ async function initBackendConnection() {
 async function syncDataFromBackend() {
   try {
     // Cargar mis reservas / todas las reservas (según rol)
-    const res = await apiCall(isAdmin() ? '/reservas' : '/reservas/mis-reservas');
+    const res = await apiCall(isAdmin() ? '/reservas/' : '/reservas/mis-reservas/');
     reservasLocales = res;
 
     // Si es administrador, también cargar los usuarios
     if (isAdmin()) {
-      const users = await apiCall('/usuarios');
+      const users = await apiCall('/usuarios/');
       usuariosLocales = users;
     }
   } catch (err) {
@@ -83,7 +83,7 @@ async function syncDataFromBackend() {
 
 // Carga las habitaciones directamente de SQL Server
 async function fetchHabitaciones() {
-  const data = await apiCall('/habitaciones');
+  const data = await apiCall('/habitaciones/');
   if (Array.isArray(data)) {
     habitaciones.length = 0;
     data.forEach(h => habitaciones.push(h));
@@ -154,7 +154,7 @@ async function registrarUsuario(datos) {
   }
 
   try {
-    const res = await apiCall('/usuarios/registro', {
+    const res = await apiCall('/usuarios/registro/', {
       method: 'POST',
       body: JSON.stringify(datos)
     });
@@ -172,7 +172,7 @@ async function loginUsuario(nombre, password) {
   }
 
   try {
-    const res = await apiCall('/usuarios/login', {
+    const res = await apiCall('/usuarios/login/', {
       method: 'POST',
       body: JSON.stringify({ nombre, password })
     });

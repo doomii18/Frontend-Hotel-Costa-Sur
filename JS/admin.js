@@ -245,7 +245,7 @@ window.adminCheckIn = async function(reservaId) {
   if (!confirm('¿Confirmar que el huésped pagó y realizó el check-in?')) return;
   
   try {
-    const res = await apiCall(`/reservas/checkin/${reservaId}`, { method: 'PUT' });
+    const res = await apiCall(`/reservas/checkin/${reservaId}/`, { method: 'PUT' });
     showToast(res.message, 'success');
     await syncDataFromBackend();
   } catch (err) {
@@ -260,7 +260,7 @@ window.adminCheckOut = async function(reservaId) {
   if (!confirm('¿Confirmar check-out y liberar la habitación?')) return;
   
   try {
-    const res = await apiCall(`/reservas/checkout/${reservaId}`, { method: 'PUT' });
+    const res = await apiCall(`/reservas/checkout/${reservaId}/`, { method: 'PUT' });
     showToast(res.message, 'success');
     await syncDataFromBackend();
     await fetchHabitaciones();
@@ -277,7 +277,7 @@ window.adminEliminarReserva = async function(reservaId) {
   if (!confirm('¿Eliminar esta reserva definitivamente?')) return;
   
   try {
-    const res = await apiCall(`/reservas/${reservaId}`, { method: 'DELETE' });
+    const res = await apiCall(`/reservas/${reservaId}/`, { method: 'DELETE' });
     showToast(res.message, 'success');
     await syncDataFromBackend();
     await fetchHabitaciones();
@@ -294,7 +294,7 @@ window.adminEliminarUsuario = async function(userId) {
   if (!confirm('¿Eliminar este usuario? Sus reservas no se eliminarán.')) return;
   
   try {
-    const res = await apiCall(`/usuarios/${userId}`, { method: 'DELETE' });
+    const res = await apiCall(`/usuarios/${userId}/`, { method: 'DELETE' });
     showToast(res.message, 'success');
     await syncDataFromBackend();
   } catch (err) {
@@ -331,7 +331,7 @@ window.adminCrearUsuario = async function() {
   if (pass.length < 8) { showToast('Contraseña mínimo 8 caracteres.', 'error'); return; }
   
   try {
-    const res = await apiCall('/usuarios', {
+    const res = await apiCall('/usuarios/', {
       method: 'POST',
       body: JSON.stringify({ nombre, email, password: pass })
     });
@@ -373,7 +373,7 @@ window.adminGuardarEdicion = async function(userId) {
   if (pass && pass.length < 8) { showToast('Contraseña mínimo 8 caracteres.', 'error'); return; }
   
   try {
-    const res = await apiCall(`/usuarios/${userId}`, {
+    const res = await apiCall(`/usuarios/${userId}/`, {
       method: 'PUT',
       body: JSON.stringify({ nombre, email, password: pass || undefined })
     });

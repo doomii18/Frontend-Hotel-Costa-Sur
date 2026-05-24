@@ -89,14 +89,16 @@ async function initBackendConnection() {
 // Sincroniza reservas y usuarios desde la BD real
 async function syncDataFromBackend() {
   try {
-    // Cargar mis reservas / todas las reservas (según rol)
-    const res = await apiCall(isAdmin() ? '/reservas/' : '/reservas/mis-reservas/');
-    reservasLocales = res;
+    // Admin usa listar-todos para ver todas las reservas, usuario solo las suyas
+    const resEndpoint = isAdmin() ? '/reservas/listar-todos/' : '/reservas/mis-reservas/';
+    const res = await apiCall(resEndpoint);
+    // El backend puede devolver array directo o paginado { results: [...] }
+    reservasLocales = Array.isArray(res) ? res : (res.results || []);
 
     // Si es administrador, también cargar los usuarios
     if (isAdmin()) {
-      const users = await apiCall('/usuarios/');
-      usuariosLocales = users;
+      const users = await apiCall('/usuarios/listar-todos/');
+      usuariosLocales = Array.isArray(users) ? users : (users.results || []);
     }
   } catch (err) {
     console.error('Error al sincronizar datos desde el backend:', err.message);

@@ -200,7 +200,7 @@ async function crearReserva(reservaData) {
   if (!usuario) { showToast('Debes iniciar sesión para reservar.', 'warning'); return false; }
 
   try {
-    const res = await apiCall('/reservas/', {
+    const res = await apiCall('/reservas/crear/', {
       method: 'POST',
       body: JSON.stringify(reservaData)
     });

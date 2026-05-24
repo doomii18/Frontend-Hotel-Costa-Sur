@@ -43,7 +43,7 @@ async function apiCall(endpoint, options = {}, retries = 2) {
     clearTimeout(timeoutId);
 
     if (response.status === 401 || response.status === 403) {
-      logoutUsuario();
+      logoutUsuario(true); // silent logout
       throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
     }
 
@@ -247,12 +247,14 @@ async function loginUsuario(nombre, password) {
   }
 }
 
-function logoutUsuario() {
+function logoutUsuario(silent = false) {
   localStorage.removeItem('token');
   setUsuarioActual(null);
   reservasLocales = [];
   usuariosLocales = [];
-  showToast('Has cerrado sesión correctamente.', 'info');
+  if (!silent) {
+    showToast('Has cerrado sesión correctamente.', 'info');
+  }
 }
 
 // =================== DISPONIBILIDAD Y CÁLCULOS ===================

@@ -43,7 +43,9 @@ async function apiCall(endpoint, options = {}, retries = 2) {
     clearTimeout(timeoutId);
 
     if (response.status === 401 || response.status === 403) {
-      logoutUsuario(true); // silent logout
+      if (!options.noLogout) {
+        logoutUsuario(true); // silent logout solo en peticiones normales
+      }
       throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
     }
 
@@ -87,21 +89,23 @@ async function initBackendConnection() {
 }
 
 // Sincroniza reservas y usuarios desde la BD real
+// noLogout=true: si hay un 401 de fondo, NO cerramos la sesión del usuario
 async function syncDataFromBackend() {
   try {
     // Admin usa listar-todos para ver todas las reservas, usuario solo las suyas
     const resEndpoint = isAdmin() ? '/reservas/listar-todos/' : '/reservas/mis-reservas/';
-    const res = await apiCall(resEndpoint);
+    const res = await apiCall(resEndpoint, { noLogout: true });
     // El backend puede devolver array directo o paginado { results: [...] }
     reservasLocales = Array.isArray(res) ? res : (res.results || []);
 
     // Si es administrador, también cargar los usuarios
     if (isAdmin()) {
-      const users = await apiCall('/usuarios/listar-todos/');
+      const users = await apiCall('/usuarios/listar-todos/', { noLogout: true });
       usuariosLocales = Array.isArray(users) ? users : (users.results || []);
     }
   } catch (err) {
-    console.error('Error al sincronizar datos desde el backend:', err.message);
+    // Error de fondo: no destruir la sesión, solo loguear
+    console.warn('Sync en background falló (no crítico):', err.message);
   }
 }
 
@@ -238,8 +242,9 @@ async function loginUsuario(nombre, password) {
     localStorage.setItem('token', res.token);
     setUsuarioActual(res.user);
     
-    // Sincronizar reservas y catálogo del usuario
-    await syncDataFromBackend();
+    // Sincronizar en segundo plano SIN esperar (fire-and-forget)
+    // Así el login NO falla aunque haya un error de red temporal en la sync
+    syncDataFromBackend();
     
     showToast(`¡Bienvenido, ${res.user.nombre}!`, 'success');
     return res.user.rol === 'admin' ? 'admin' : true;

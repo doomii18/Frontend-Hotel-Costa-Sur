@@ -54,7 +54,9 @@ async function apiCall(endpoint, options = {}, retries = 2) {
 
     return await response.json();
   } catch (error) {
-    if (retries > 0 && error.name !== 'AbortError' && !error.message.includes('Sesión expirada')) {
+    const method = options.method || 'GET';
+    // Solo reintentar si es GET y quedan intentos
+    if (method === 'GET' && retries > 0 && error.name !== 'AbortError' && !error.message.includes('Sesión expirada')) {
       console.warn(`Reintentando petición a ${endpoint}... Quedan ${retries} intentos.`);
       await new Promise(res => setTimeout(res, 1000));
       return apiCall(endpoint, options, retries - 1);

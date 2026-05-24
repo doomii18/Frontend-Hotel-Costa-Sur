@@ -234,8 +234,14 @@ async function loginUsuario(nombre, password) {
   }
 
   try {
+    // IMPORTANTE: Limpiar token viejo ANTES de llamar al login
+    // Si hay un token expirado en localStorage, el backend lo rechazaría con 401
+    // antes de siquiera leer usuario/contraseña
+    localStorage.removeItem('token');
+
     const res = await apiCall('/usuarios/login/', {
       method: 'POST',
+      noLogout: true,  // Nunca cerrar sesión por fallo en el login
       body: JSON.stringify({ nombre, password })
     });
     
@@ -243,13 +249,14 @@ async function loginUsuario(nombre, password) {
     setUsuarioActual(res.user);
     
     // Sincronizar en segundo plano SIN esperar (fire-and-forget)
-    // Así el login NO falla aunque haya un error de red temporal en la sync
     syncDataFromBackend();
     
     showToast(`¡Bienvenido, ${res.user.nombre}!`, 'success');
     return res.user.rol === 'admin' ? 'admin' : true;
   } catch (err) {
-    showToast(err.message, 'error');
+    // Mostrar el mensaje real del servidor si hay error de credenciales
+    const msg = err.message.includes('expirada') ? 'Usuario o contraseña incorrectos.' : err.message;
+    showToast(msg, 'error');
     return false;
   }
 }

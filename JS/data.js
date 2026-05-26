@@ -51,10 +51,17 @@ async function apiCall(endpoint, options = {}, retries = 2) {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || `Error del servidor (${response.status})`);
+      throw new Error(errorData.message || errorData.error || `Error del servidor (${response.status})`);
     }
 
-    return await response.json();
+    // DELETE suele devolver 204 No Content (body vacío)
+    if (response.status === 204 || response.headers.get('content-length') === '0') {
+      return { message: 'Operación realizada exitosamente.' };
+    }
+
+    const text = await response.text();
+    if (!text) return { message: 'Operación realizada exitosamente.' };
+    return JSON.parse(text);
   } catch (error) {
     const method = options.method || 'GET';
     // Solo reintentar si es GET y quedan intentos

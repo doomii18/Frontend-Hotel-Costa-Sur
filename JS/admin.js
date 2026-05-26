@@ -126,9 +126,15 @@ window.switchAdminTab = function(tab, btn) {
                   <strong>Huésped:</strong> ${r.nombres} ${r.apellidos}<br>
                   <strong>Entrada:</strong> ${r.fechaIngreso} &nbsp;·&nbsp; <strong>Salida:</strong> ${r.fechaSalida}
                 </div>
-                ${estado === 'pendiente' ? `<button onclick="adminCheckIn(${r.id})" class="adm-btn adm-btn--green">✅ Check-in · Confirmar pago</button>` : ''}
-                ${estado === 'activo'    ? `<button onclick="adminCheckOut(${r.id})" class="adm-btn adm-btn--blue">🚪 Check-out · Liberar</button>` : ''}
+                ${estado === 'pendiente' ? `<button onclick="adminCheckIn(${r.id})" class="adm-btn adm-btn--green" style="margin-bottom:0.3rem;">✅ Check-in · Confirmar pago</button>` : ''}
+                ${estado === 'activo'    ? `<button onclick="adminCheckOut(${r.id})" class="adm-btn adm-btn--blue" style="margin-bottom:0.3rem;">🚪 Check-out · Liberar</button>` : ''}
               ` : `<div class="adm-room-card__free">Disponible para reservar</div>`}
+              <div style="margin-top:0.8rem; border-top:1px solid #eee; padding-top:0.8rem;">
+                  <button onclick="verDisponibilidad(${h.id}, '${h.nombre}')" class="adm-btn adm-btn--ghost" style="width:100%; border:1px solid #ccc;">📅 Ver Disponibilidad</button>
+                  <div id="disp-cal-${h.id}" style="margin-top:0.5rem; display:none;">
+                      <input type="text" id="fp-${h.id}" style="display:none;">
+                  </div>
+              </div>
             </div>`;
         }).join('')
       }</div>`;
@@ -136,10 +142,16 @@ window.switchAdminTab = function(tab, btn) {
   // ── RESERVAS ──────────────────────────────────────────
   } else if (tab === 'reservas') {
     content.innerHTML = `
-      <input type="text" id="searchRes"
-        placeholder="🔍 Buscar por huésped, habitación, cédula…"
-        oninput="filtrarTablaReservas(this.value)"
-        class="adm-search-input">
+      <div class="adm-toolbar" style="display:flex; gap:1rem; flex-wrap:wrap; align-items:center;">
+        <input type="text" id="searchRes"
+          placeholder="🔍 Buscar por huésped, habitación, cédula…"
+          oninput="filtrarTablaReservas()"
+          class="adm-search-input" style="flex:1;">
+        <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer; background:white; padding:0.7rem 1.2rem; border-radius:50px; border:1px solid #d9e2ec;">
+          <input type="checkbox" id="unconfirmedFilter" onchange="filtrarTablaReservas()"> 
+          <span style="font-weight:500; color:#1E2A32;">Solo no confirmadas</span>
+        </label>
+      </div>
       <div id="resTable">${buildReservasTable(reservas)}</div>`;
 
   // ── USUARIOS ──────────────────────────────────────────
@@ -165,17 +177,19 @@ function buildReservasTable(reservas) {
     <div class="adm-table-wrap">
       <table class="adm-table">
         <thead><tr>
-          <th>Habitación</th><th>Huésped</th><th>Cédula / Pasaporte</th>
-          <th>Entrada</th><th>Salida</th><th>Días</th><th>Total</th><th>Estado</th><th>Acciones</th>
+          <th>Habitación / Tipo</th><th>Huésped</th><th>Cédula / Pasaporte</th>
+          <th>Precio / Noche</th><th>Fechas</th><th>Huéspedes</th><th>Total</th><th>Estado</th><th>Acciones</th>
         </tr></thead>
-        <tbody>${reservas.map(r => `
+        <tbody>${reservas.map(r => {
+          const room = habitaciones.find(h => h.id === r.habitacionId);
+          return `
           <tr>
-            <td><strong>${r.habitacionNombre}</strong></td>
+            <td><strong>${r.habitacionNombre}</strong><br><small style="color:#888;">${room ? room.tipo : ''}</small></td>
             <td>${r.nombres} ${r.apellidos}<br><small style="color:#888;">${r.usuarioNombre}</small></td>
             <td style="font-size:.82rem;">${r.cedula || r.pasaporte || '—'}</td>
-            <td>${r.fechaIngreso}</td>
-            <td>${r.fechaSalida}</td>
-            <td>${r.dias}</td>
+            <td>C$${r.precioPorNoche}</td>
+            <td>In: ${r.fechaIngreso}<br>Out: ${r.fechaSalida}</td>
+            <td>${r.huespedes || 1}</td>
             <td><strong>C$${r.total}</strong></td>
             <td>
               <span class="adm-badge"
@@ -184,12 +198,14 @@ function buildReservasTable(reservas) {
               </span>
             </td>
             <td>
+              <button onclick="adminCheckIn(${r.id})" class="adm-btn adm-btn--primary" style="font-size:.78rem; margin-bottom:.3rem;">✅ Confirmar</button><br>
               <button onclick="adminEliminarReserva(${r.id})"
                 class="adm-btn adm-btn--danger" style="font-size:.78rem;">
                 🗑 Eliminar
               </button>
             </td>
-          </tr>`).join('')}
+          </tr>`
+        }).join('')}
         </tbody>
       </table>
     </div>`;
@@ -224,11 +240,18 @@ function buildUsuariosTable(users) {
 }
 
 // =================== FILTROS EN VIVO ===================
-window.filtrarTablaReservas = function(q) {
-  const term     = q.toLowerCase();
-  const filtered = getReservas().filter(r =>
+window.filtrarTablaReservas = function() {
+  const term = (document.getElementById('searchRes')?.value || '').toLowerCase();
+  const unconfirmed = document.getElementById('unconfirmedFilter')?.checked;
+  
+  let filtered = getReservas().filter(r =>
     `${r.nombres} ${r.apellidos} ${r.habitacionNombre} ${r.cedula || ''} ${r.pasaporte || ''}`.toLowerCase().includes(term)
   );
+  
+  if (unconfirmed) {
+      filtered = filtered.filter(r => r.estado === 'pendiente' || !r.estado);
+  }
+  
   document.getElementById('resTable').innerHTML = buildReservasTable(filtered);
 };
 
@@ -385,6 +408,33 @@ window.adminGuardarEdicion = async function(userId) {
   }
   
   switchAdminTab('usuarios', document.getElementById('tab-usuarios'));
+};
+
+// =================== VER DISPONIBILIDAD ===================
+window.verDisponibilidad = async function(id, nombre) {
+    const calDiv = document.getElementById(`disp-cal-${id}`);
+    const fpInput = document.getElementById(`fp-${id}`);
+    if (calDiv.style.display === 'block') {
+        calDiv.style.display = 'none';
+        return;
+    }
+    calDiv.style.display = 'block';
+    
+    // Fetch dates
+    let disabledDates = [];
+    try {
+        const res = await apiCall(`/reservas/fechas-no-disponibles/${id}`);
+        if (res && res.fechas) disabledDates = res.fechas;
+    } catch(e) { console.warn("Could not fetch dates", e); }
+    
+    flatpickr(fpInput, {
+        inline: true,
+        minDate: "today",
+        disable: disabledDates,
+        locale: {
+            firstDayOfWeek: 1
+        }
+    });
 };
 
 // =================== INICIALIZACIÓN ===================

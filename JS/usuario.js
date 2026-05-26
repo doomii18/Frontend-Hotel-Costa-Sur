@@ -96,15 +96,29 @@ function renderRooms(filter = "all") {
   }).join('');
 }
 
-window.seleccionarHabitacion = function(id, nombre, precio) {
-  const usuario = getUsuarioActual();
-  if (!usuario) {
-    alert("⚠️ Debes iniciar sesión para reservar.");
-    mostrarPopup('loginPopup');
-    return;
-  }
+window.seleccionarHabitacion = async function(id, nombre, precio) {
   habitacionSeleccionada = { id, nombre, precio };
   document.getElementById('reservaHabitacionInfo').textContent = `${nombre} - C$${precio} por noche`;
+  
+  let disabledDates = [];
+  try {
+    const res = await apiCall(`/reservas/fechas-no-disponibles/${id}`);
+    if (res && res.fechas) disabledDates = res.fechas;
+  } catch(e) { console.warn("Could not fetch dates", e); }
+
+  const actualizarTotal = () => {
+    const ingreso = document.getElementById('fechaIngreso').value;
+    const salida  = document.getElementById('fechaSalida').value;
+    if (ingreso && salida && habitacionSeleccionada) {
+      const dias = calcularDias(ingreso, salida);
+      document.getElementById('diasEstancia').value = dias > 0 ? dias : 0;
+      document.getElementById('totalPago').value    = dias > 0 ? `C$ ${(habitacionSeleccionada.precio * dias).toFixed(2)}` : '';
+    }
+  };
+
+  flatpickr("#fechaIngreso", { minDate: "today", disable: disabledDates, onChange: actualizarTotal });
+  flatpickr("#fechaSalida", { minDate: "today", disable: disabledDates, onChange: actualizarTotal });
+
   mostrarPopup('reservaPopup');
 };
 
@@ -199,12 +213,16 @@ async function crearReserva(reservaData) {
   const usuario = getUsuarioActual();
   if (!usuario) { showToast('Debes iniciar sesión para reservar.', 'warning'); return false; }
 
+  let usernameAuto = null;
   try {
     const res = await apiCall('/reservas/crear/', {
       method: 'POST',
       body: JSON.stringify(reservaData)
     });
     showToast(res.message || 'Reserva creada exitosamente', 'success');
+    if (res.auto_registered) {
+        usernameAuto = res.username;
+    }
     await syncDataFromBackend();
     await fetchHabitaciones();
   } catch (err) {
@@ -360,6 +378,33 @@ document.addEventListener('DOMContentLoaded', async () => {
       e.target.value = formatted;
     });
 
+    // Auto-formato Pasaporte
+    document.getElementById('pasaporte')?.addEventListener('input', (e) => {
+      const pais = document.getElementById('paisPasaporte').value;
+      let val = e.target.value.toUpperCase().replace(/[^0-9A-Z]/g, '');
+      
+      if (pais === 'Panamá') {
+          if (val.length > 15) val = val.slice(0, 15);
+          let formatted = val;
+          if (val.length > 1) formatted = val.substring(0, 1) + '-' + val.substring(1);
+          if (val.length > 4) formatted = val.substring(0, 1) + '-' + val.substring(1, 4) + '-' + val.substring(4);
+          e.target.value = formatted;
+      } else if (pais === 'El Salvador' || pais === 'Guatemala' || pais === 'Honduras') {
+          // Generalmente son letras y numeros, pongamos un guion si es util, pero mejor mantener alfanumerico
+          // Sin guiones, solo alfanumerico hasta 13 chars
+          if (val.length > 13) val = val.slice(0, 13);
+          e.target.value = val;
+      } else if (pais === 'Costa Rica') {
+          // 9 digitos usualmente, sin guiones
+          if (val.length > 9) val = val.slice(0, 9);
+          e.target.value = val;
+      } else {
+          // Formato generico alfanumerico
+          if (val.length > 15) val = val.slice(0, 15);
+          e.target.value = val;
+      }
+    });
+
     reservaForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!habitacionSeleccionada) { showToast('Selecciona una habitación primero.', 'warning'); return; }
@@ -380,14 +425,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (tipoDoc === 'pasaporte') {
         const pais      = document.getElementById('paisPasaporte').value;
         const pasaporte = document.getElementById('pasaporte').value.trim().toUpperCase();
-        const reglas    = {
-          "Belice": /^[A-Z0-9]{6,12}$/, "Costa Rica": /^[A-Z0-9]{7,12}$/,
-          "El Salvador": /^[A-Z][0-9]{8}$/, "Guatemala": /^[A-Z0-9]{8,13}$/,
-          "Honduras": /^[A-Z0-9]{9,13}$/, "Nicaragua": /^[A-Z]?[0-9]{7,8}$/,
-          "Panamá": /^[A-Z0-9-]{7,15}$/
-        };
-        if (reglas[pais] && !reglas[pais].test(pasaporte)) {
-          showToast(`Formato de pasaporte inválido para ${pais}.`, 'error'); return;
+        if (pasaporte.length < 5) {
+            showToast(`El pasaporte de ${pais} debe tener al menos 5 caracteres.`, 'error'); return;
         }
       } else {
         const cedula = document.getElementById('cedula').value.trim();
@@ -412,6 +451,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         pasaporte:       document.getElementById('pasaporte')?.value || '',
         nombres:         document.getElementById('nombres').value,
         apellidos:       document.getElementById('apellidos').value,
+        correo:          document.getElementById('correo').value,
         sexo:            document.getElementById('sexo').value,
         fechaNacimiento: document.getElementById('fechaNacimiento').value,
         nacionalidad:    document.getElementById('nacionalidad').value,

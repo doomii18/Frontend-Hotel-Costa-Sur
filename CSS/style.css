@@ -1317,31 +1317,49 @@ body.popup-open {
 
 /* MARKETING BANNER / SORTEO */
 .marketing-banner {
-  background: #f4f7fb;
+  background: linear-gradient(135deg, #0056b3 0%, #002244 100%);
   border-radius: 20px;
-  padding: 3rem;
+  padding: 4rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 3rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 15px 40px rgba(0, 86, 179, 0.3);
   margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.marketing-banner::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+  z-index: 1;
 }
 
 .marketing-text {
   flex: 1;
+  position: relative;
+  z-index: 2;
+  color: white;
 }
 
 .marketing-text h2 {
-  font-size: 2rem;
+  font-size: 2.5rem;
   margin-bottom: 1rem;
-  color: var(--azul-profundo);
+  color: #fff;
+  font-weight: 800;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.2);
 }
 
 .marketing-text p {
-  font-size: 1.05rem;
-  line-height: 1.6;
-  color: var(--gris-texto);
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .marketing-form {
@@ -1349,52 +1367,59 @@ body.popup-open {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  background: white;
-  padding: 2.5rem;
-  border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 3rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  position: relative;
+  z-index: 2;
+  border: 1px solid rgba(255,255,255,0.2);
 }
 
 .marketing-form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: 1.2rem;
 }
 
 .marketing-form input,
 .marketing-select {
-  padding: 0.9rem 1rem;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  padding: 1rem 1.2rem;
+  border-radius: 10px;
+  border: 1px solid #d9e2ec;
   font-family: inherit;
   font-size: 0.95rem;
   outline: none;
-  background: #fcfcfc;
-  transition: var(--transition);
+  background: #f8fbff;
+  transition: all 0.3s ease;
 }
 
 .marketing-form input:focus,
 .marketing-select:focus {
-  border-color: var(--azul-profundo);
+  border-color: #0056b3;
   background: white;
+  box-shadow: 0 0 0 3px rgba(0,86,179,0.1);
 }
 
 .marketing-btn {
-  background: var(--azul-profundo);
-  color: white;
+  background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+  color: #002244;
   border: none;
-  padding: 1rem;
-  border-radius: 8px;
-  font-size: 1.05rem;
-  font-weight: 600;
+  padding: 1.2rem;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 800;
   cursor: pointer;
-  transition: var(--transition);
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .marketing-btn:hover {
-  background: var(--amarillo-miel);
-  color: var(--azul-profundo);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(255, 152, 0, 0.4);
 }
 
 @media (max-width: 768px) {
@@ -1405,6 +1430,9 @@ body.popup-open {
   }
   .marketing-form-grid {
     grid-template-columns: 1fr;
+  }
+  .marketing-form {
+    padding: 2rem;
   }
 }
 

@@ -264,10 +264,17 @@
 
   <!-- SECCIÓN MARKETING / SORTEO -->
   <section class="section marketing-section" style="padding-bottom: 2rem;">
-    <div class="marketing-banner">
+    <div class="marketing-banner sorteo-premium">
+      <div class="sorteo-confetti"></div>
       <div class="marketing-text">
-        <h2>🎁 ¡Gana una noche de estadía gratis!</h2>
-        <p>Participa en nuestro sorteo mensual. Solo déjanos tu nombre y correo, y te contactaremos si eres el afortunado ganador.</p>
+        <div class="sorteo-badge">🏆 OFERTA EXCLUSIVA</div>
+        <h2>🎁 ¡Gana una noche <span style="color:#FFD700;">GRATIS</span>!</h2>
+        <p>Participa en nuestro <strong>sorteo mensual exclusivo</strong>. Solo déjanos tus datos y podrías ser el afortunado ganador de una noche completamente gratis en nuestro hotel.</p>
+        <div class="sorteo-features">
+          <span>✅ 100% Gratis</span>
+          <span>🎯 Sorteo mensual</span>
+          <span>📞 Te contactamos</span>
+        </div>
       </div>
       <form class="marketing-form" id="sorteoForm">
         <div class="marketing-form-grid">
@@ -435,13 +442,6 @@
         <div class="form-row" id="containerPasaporte" style="display: none;">
           <div class="form-group"><label class="form-label">País Emisor *</label><select id="paisPasaporte">
               <option value="">Seleccione país...</option>
-              <option value="Belice">Belice</option>
-              <option value="Costa Rica">Costa Rica</option>
-              <option value="El Salvador">El Salvador</option>
-              <option value="Guatemala">Guatemala</option>
-              <option value="Honduras">Honduras</option>
-              <option value="Nicaragua">Nicaragua</option>
-              <option value="Panamá">Panamá</option>
             </select></div>
           <div class="form-group"><label class="form-label">No. Pasaporte *</label><input type="text" id="pasaporte" placeholder="Número de Pasaporte"></div>
         </div>
@@ -465,20 +465,6 @@
               id="fechaNacimiento" required></div>
           <div class="form-group"><label class="form-label">Nacionalidad *</label><select id="nacionalidad" required>
               <option value="">Seleccione su nacionalidad</option>
-              <option value="Nicaragüense">Nicaragüense</option>
-              <option value="Costarricense">Costarricense</option>
-              <option value="Estadounidense">Estadounidense</option>
-              <option value="Mexicana">Mexicana</option>
-              <option value="Salvadoreña">Salvadoreña</option>
-              <option value="Hondureña">Hondureña</option>
-              <option value="Guatemalteca">Guatemalteca</option>
-              <option value="Panameña">Panameña</option>
-              <option value="Canadiense">Canadiense</option>
-              <option value="Española">Española</option>
-              <option value="Colombiana">Colombiana</option>
-              <option value="Argentina">Argentina</option>
-              <option value="Chilena">Chilena</option>
-              <option value="Otras">Otras</option>
             </select></div>
         </div>
         <div class="form-row">
@@ -486,10 +472,10 @@
               id="procedencia" placeholder="Ej: Managua" required></div>
         </div>
         <div class="form-row">
-          <div class="form-group"><label class="form-label">Fecha de Entrada *</label><input type="date"
-              id="fechaIngreso" required></div>
-          <div class="form-group"><label class="form-label">Fecha de Salida *</label><input type="date" id="fechaSalida"
-              required></div>
+          <div class="form-group"><label class="form-label">Fecha de Entrada *</label><input type="text"
+              id="fechaIngreso" placeholder="Seleccionar fecha" required></div>
+          <div class="form-group"><label class="form-label">Fecha de Salida *</label><input type="text" id="fechaSalida"
+              placeholder="Seleccionar fecha" required></div>
         </div>
         <div class="form-row">
           <div class="form-group"><label class="form-label">Días de Estancia</label><input type="number"

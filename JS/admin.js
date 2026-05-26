@@ -22,6 +22,7 @@ function renderAdminPanel() {
       <button class="adm-tab"          id="tab-habitaciones" onclick="switchAdminTab('habitaciones',this)">🏨 Habitaciones</button>
       <button class="adm-tab"          id="tab-reservas"     onclick="switchAdminTab('reservas',    this)">📋 Reservas</button>
       <button class="adm-tab"          id="tab-usuarios"     onclick="switchAdminTab('usuarios',    this)">👥 Usuarios</button>
+      <button class="adm-tab"          id="tab-sorteos"      onclick="switchAdminTab('sorteos',     this)">🎁 Sorteos</button>
     </div>
     <div id="adminTabContent" style="margin-top:1.5rem;"></div>`;
 
@@ -165,6 +166,16 @@ window.switchAdminTab = function(tab, btn) {
         <button onclick="formNuevoUsuario()" class="adm-btn adm-btn--primary">+ Crear usuario</button>
       </div>
       <div id="usrTable">${buildUsuariosTable(users)}</div>`;
+
+  // ── SORTEOS ──────────────────────────────────────────
+  } else if (tab === 'sorteos') {
+    content.innerHTML = `
+      <div class="adm-toolbar">
+        <h2 style="margin:0; font-size:1.4rem; color:var(--texto-oscuro);">🎁 Participantes del Sorteo</h2>
+        <button onclick="cargarSorteos()" class="adm-btn adm-btn--primary">🔄 Actualizar</button>
+      </div>
+      <div id="sorteosTable"><p class="adm-empty">Cargando participantes...</p></div>`;
+    cargarSorteos();
   }
 };
 
@@ -234,6 +245,38 @@ function buildUsuariosTable(users) {
             </td>
           </tr>`;
         }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+window.cargarSorteos = async function() {
+  try {
+    const res = await apiCall('/sorteos/listar/');
+    const sorteos = Array.isArray(res) ? res : (res.results || []);
+    document.getElementById('sorteosTable').innerHTML = buildSorteosTable(sorteos);
+  } catch (err) {
+    document.getElementById('sorteosTable').innerHTML = `<p class="adm-empty" style="color:red;">Error al cargar sorteos: ${err.message}</p>`;
+  }
+};
+
+function buildSorteosTable(sorteos) {
+  if (!sorteos.length) return '<p class="adm-empty">No hay participantes registrados en el sorteo.</p>';
+  return `
+    <div class="adm-table-wrap">
+      <table class="adm-table">
+        <thead><tr>
+          <th>Participante</th><th>Contacto</th><th>Departamento</th><th>Sexo / Edad</th><th>Ocupación</th><th>Fecha</th>
+        </tr></thead>
+        <tbody>${sorteos.map(s => `
+          <tr>
+            <td><strong>${s.nombres} ${s.apellidos}</strong></td>
+            <td>📞 ${s.telefono}<br>✉️ ${s.email}</td>
+            <td>${s.departamento}</td>
+            <td>${s.sexo} / ${s.edad} años</td>
+            <td>${s.ocupacion}</td>
+            <td style="font-size:0.85rem;">${new Date(s.fecha_registro).toLocaleString('es-NI')}</td>
+          </tr>`).join('')}
         </tbody>
       </table>
     </div>`;

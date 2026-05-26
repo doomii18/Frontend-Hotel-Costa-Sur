@@ -1,11 +1,58 @@
 // ================================================================
 //  usuario.js  — Lógica exclusiva del usuario / huésped
-//  Hotel Costa Sur  |  Depende de: data.js (Conexión SQL Server)
+//  Hotel Costa Sur  |  Depende de: data.js
 // ================================================================
 
 // =================== ESTADO LOCAL ===================
 let habitacionSeleccionada = null;
 let currentFilter = "all";
+
+// =================== LISTA COMPLETA DE NACIONALIDADES DEL MUNDO ===================
+const NACIONALIDADES = [
+  "Afgana","Albanesa","Alemana","Andorrana","Angoleña","Antiguana","Saudí","Argelina","Argentina","Armenia",
+  "Australiana","Austriaca","Azerbaiyana","Bahameña","Bangladesí","Barbadense","Bareiní","Belga","Beliceña","Beninesa",
+  "Bielorrusa","Birmana","Boliviana","Bosnia","Botswanesa","Brasileña","Bruneana","Búlgara","Burkinesa","Burundesa",
+  "Butanesa","Caboverdiana","Camboyana","Camerunesa","Canadiense","Catarí","Chadiana","Checa","Chilena","China",
+  "Chipriota","Colombiana","Comorense","Congoleña","Norcoreana","Surcoreana","Costarricense","Croata","Cubana","Danesa",
+  "Dominicana","Dominiquesa","Ecuatoguineana","Ecuatoriana","Egipcia","Emiratí","Eritrea","Eslovaca","Eslovena","Española",
+  "Estadounidense","Estonia","Etíope","Filipina","Finlandesa","Fiyiana","Francesa","Gabonesa","Gambiana","Georgiana",
+  "Ghanesa","Granadina","Griega","Guatemalteca","Guineana","Guyanesa","Haitiana","Hondureña","Húngara","India",
+  "Indonesia","Iraquí","Iraní","Irlandesa","Islandesa","Israelí","Italiana","Jamaicana","Japonesa","Jordana",
+  "Kazaja","Keniata","Kirguisa","Kiribatiana","Kuwaití","Laosiana","Lesotense","Letona","Libanesa","Liberiana",
+  "Libia","Liechtensteiniana","Lituana","Luxemburguesa","Macedonia","Malgache","Malasia","Malauí","Maldiva","Maliense",
+  "Maltesa","Marfileña","Marroquí","Mauriciana","Mauritana","Mexicana","Micronesia","Moldava","Monegasca","Mongola",
+  "Montenegrina","Mozambiqueña","Namibia","Nauruana","Nepalesa","Nicaragüense","Nigerina","Nigeriana","Noruega",
+  "Neozelandesa","Omaní","Neerlandesa","Pakistaní","Palauana","Palestina","Panameña","Papú","Paraguaya","Peruana",
+  "Polaca","Portuguesa","Puertorriqueña","Británica","Centroafricana","Ruandesa","Rumana","Rusa","Salvadoreña","Samoana",
+  "Sanmarinense","Santotomense","Senegalesa","Serbia","Seychellense","Sierraleonesa","Singapurense","Siria","Somalí",
+  "Srilanquesa","Suazi","Sudafricana","Sudanesa","Sueca","Suiza","Surinamesa","Tailandesa","Taiwanesa","Tanzana",
+  "Tayika","Timorense","Togolesa","Tongana","Trinitense","Tunecina","Turca","Turkmena","Tuvaluana","Ucraniana",
+  "Ugandesa","Uruguaya","Uzbeka","Vanuatuense","Vaticana","Venezolana","Vietnamita","Yemení","Yibutiana","Zambiana",
+  "Zimbabuense"
+].sort();
+
+// =================== PAÍSES PARA PASAPORTE (emisores) ===================
+const PAISES_PASAPORTE = [
+  "Afganistán","Albania","Alemania","Andorra","Angola","Antigua y Barbuda","Arabia Saudita","Argelia","Argentina","Armenia",
+  "Australia","Austria","Azerbaiyán","Bahamas","Bangladés","Barbados","Baréin","Bélgica","Belice","Benín",
+  "Bielorrusia","Birmania","Bolivia","Bosnia y Herzegovina","Botsuana","Brasil","Brunéi","Bulgaria","Burkina Faso","Burundi",
+  "Bután","Cabo Verde","Camboya","Camerún","Canadá","Catar","Chad","Chequia","Chile","China",
+  "Chipre","Colombia","Comoras","Congo","Corea del Norte","Corea del Sur","Costa Rica","Croacia","Cuba","Dinamarca",
+  "Dominica","Ecuador","Egipto","El Salvador","Emiratos Árabes Unidos","Eritrea","Eslovaquia","Eslovenia","España","Estados Unidos",
+  "Estonia","Etiopía","Filipinas","Finlandia","Fiyi","Francia","Gabón","Gambia","Georgia","Ghana",
+  "Granada","Grecia","Guatemala","Guinea","Guyana","Haití","Honduras","Hungría","India","Indonesia",
+  "Irak","Irán","Irlanda","Islandia","Israel","Italia","Jamaica","Japón","Jordania","Kazajistán",
+  "Kenia","Kirguistán","Kiribati","Kuwait","Laos","Lesoto","Letonia","Líbano","Liberia","Libia",
+  "Liechtenstein","Lituania","Luxemburgo","Macedonia del Norte","Madagascar","Malasia","Malaui","Maldivas","Malí","Malta",
+  "Marruecos","Mauricio","Mauritania","México","Micronesia","Moldavia","Mónaco","Mongolia","Montenegro","Mozambique",
+  "Namibia","Nauru","Nepal","Nicaragua","Níger","Nigeria","Noruega","Nueva Zelanda","Omán","Países Bajos",
+  "Pakistán","Palaos","Palestina","Panamá","Papúa Nueva Guinea","Paraguay","Perú","Polonia","Portugal","Puerto Rico",
+  "Reino Unido","República Centroafricana","República Dominicana","Ruanda","Rumanía","Rusia","Samoa","San Marino",
+  "Santo Tomé y Príncipe","Senegal","Serbia","Seychelles","Sierra Leona","Singapur","Siria","Somalia","Sri Lanka",
+  "Suazilandia","Sudáfrica","Sudán","Suecia","Suiza","Surinam","Tailandia","Taiwán","Tanzania","Tayikistán",
+  "Timor Oriental","Togo","Tonga","Trinidad y Tobago","Túnez","Turquía","Turkmenistán","Tuvalu","Ucrania","Uganda",
+  "Uruguay","Uzbekistán","Vanuatu","Vaticano","Venezuela","Vietnam","Yemen","Yibuti","Zambia","Zimbabue"
+].sort();
 
 // =================== HEADER ===================
 function actualizarHeaderUsuario() {
@@ -29,7 +76,7 @@ function actualizarHeaderUsuario() {
   }
 }
 
-// =================== RENDERIZAR HABITACIONES (DESDE SQL SERVER) ===================
+// =================== RENDERIZAR HABITACIONES ===================
 function renderRooms(filter = "all") {
   const container = document.getElementById('roomsContainer');
   if (!container) return;
@@ -97,12 +144,19 @@ function renderRooms(filter = "all") {
 }
 
 window.seleccionarHabitacion = async function(id, nombre, precio) {
+  // Verificar que el usuario esté logueado
+  if (!getUsuarioActual()) {
+    showToast('Debes iniciar sesión para poder reservar.', 'warning');
+    mostrarPopup('loginPopup');
+    return;
+  }
+
   habitacionSeleccionada = { id, nombre, precio };
   document.getElementById('reservaHabitacionInfo').textContent = `${nombre} - C$${precio} por noche`;
   
   let disabledDates = [];
   try {
-    const res = await apiCall(`/reservas/fechas-no-disponibles/${id}`);
+    const res = await apiCall(`/reservas/fechas-no-disponibles/${id}/`);
     if (res && res.fechas) disabledDates = res.fechas;
   } catch(e) { console.warn("Could not fetch dates", e); }
 
@@ -116,11 +170,66 @@ window.seleccionarHabitacion = async function(id, nombre, precio) {
     }
   };
 
-  flatpickr("#fechaIngreso", { minDate: "today", disable: disabledDates, onChange: actualizarTotal });
-  flatpickr("#fechaSalida", { minDate: "today", disable: disabledDates, onChange: actualizarTotal });
+  // Destroy previous flatpickr instances if any
+  const fpIngreso = document.getElementById('fechaIngreso');
+  const fpSalida  = document.getElementById('fechaSalida');
+  if (fpIngreso._flatpickr) fpIngreso._flatpickr.destroy();
+  if (fpSalida._flatpickr)  fpSalida._flatpickr.destroy();
+
+  flatpickr(fpIngreso, {
+    minDate: "today",
+    disable: disabledDates,
+    dateFormat: "Y-m-d",
+    locale: "es",
+    onChange: function() {
+      actualizarTotal();
+      // Actualizar minDate de salida
+      const val = fpIngreso.value;
+      if (val && fpSalida._flatpickr) {
+        const nextDay = new Date(val);
+        nextDay.setDate(nextDay.getDate() + 1);
+        fpSalida._flatpickr.set('minDate', nextDay);
+      }
+    }
+  });
+  flatpickr(fpSalida, {
+    minDate: "today",
+    disable: disabledDates,
+    dateFormat: "Y-m-d",
+    locale: "es",
+    onChange: actualizarTotal
+  });
+
+  // Populate nationalities dynamically
+  populateNacionalidades();
+  populatePaisesPasaporte();
 
   mostrarPopup('reservaPopup');
 };
+
+function populateNacionalidades() {
+  const sel = document.getElementById('nacionalidad');
+  if (!sel || sel.options.length > 5) return; // Already populated
+  sel.innerHTML = '<option value="">Seleccione su nacionalidad</option>';
+  NACIONALIDADES.forEach(n => {
+    const opt = document.createElement('option');
+    opt.value = n;
+    opt.textContent = n;
+    sel.appendChild(opt);
+  });
+}
+
+function populatePaisesPasaporte() {
+  const sel = document.getElementById('paisPasaporte');
+  if (!sel || sel.options.length > 10) return; // Already populated
+  sel.innerHTML = '<option value="">Seleccione país emisor...</option>';
+  PAISES_PASAPORTE.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p;
+    opt.textContent = p;
+    sel.appendChild(opt);
+  });
+}
 
 function setupFilters() {
   const btns = document.querySelectorAll('.filter-btn');
@@ -173,23 +282,107 @@ async function mostrarMisReservas() {
   if (reservas.length === 0) {
     container.innerHTML = '<p style="text-align:center; padding:2rem;">📭 No tienes reservas aún.</p>';
   } else {
-    container.innerHTML = reservas.map(r => `
-      <div style="border:1px solid #ddd; margin-bottom:1rem; padding:1rem; border-radius:12px;">
-        <strong>${r.habitacionNombre}</strong><br>
+    container.innerHTML = reservas.map(r => {
+      const estadoLabel = r.estado === 'activo' ? '🔑 Activo' : r.estado === 'completado' ? '✅ Completado' : r.estado === 'cancelado' ? '❌ Cancelado' : '📅 Pendiente';
+      const canEdit = r.estado === 'pendiente' || !r.estado;
+      return `
+      <div style="border:1px solid #ddd; margin-bottom:1rem; padding:1.2rem; border-radius:12px; background:#fafafa;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+          <strong style="font-size:1.05rem;">${r.habitacionNombre}</strong>
+          <span style="font-size:0.85rem; padding:0.3rem 0.8rem; border-radius:20px; background:#f0f0f0; font-weight:600;">${estadoLabel}</span>
+        </div>
         Entrada: ${r.fechaIngreso} | Salida: ${r.fechaSalida}<br>
         Días: ${r.dias} | Total: C$${r.total}<br>
         Huésped: ${r.nombres} ${r.apellidos}
-        <div style="margin-top: 0.8rem;">
-          <button class="popup__btn popup__btn--cerrar" style="padding: 0.4rem 1rem; font-size: 0.8rem;"
-            onclick="cancelarReserva(${r.id})">Cancelar reserva</button>
+        <div style="margin-top: 0.8rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+          ${canEdit ? `<button class="popup__btn popup__btn--reservar" style="padding: 0.4rem 1rem; font-size: 0.8rem; flex:none;"
+            onclick="editarReserva(${r.id})">✏️ Editar</button>` : ''}
+          ${canEdit ? `<button class="popup__btn popup__btn--cerrar" style="padding: 0.4rem 1rem; font-size: 0.8rem; flex:none;"
+            onclick="cancelarReserva(${r.id})">🗑 Cancelar</button>` : ''}
         </div>
       </div>
-    `).join('');
+    `}).join('');
   }
   mostrarPopup('misReservasPopup');
 }
 
-// =================== CANCELAR RESERVA (SQL SERVER) ===================
+// =================== EDITAR RESERVA ===================
+window.editarReserva = async function(reservaId) {
+  const reserva = getReservas().find(r => r.id === reservaId);
+  if (!reserva) { showToast('Reserva no encontrada.', 'error'); return; }
+
+  // Find room
+  const room = habitaciones.find(h => h.id === reserva.habitacionId);
+  if (!room) { showToast('Habitación no encontrada.', 'error'); return; }
+
+  cerrarPopup('misReservasPopup');
+
+  habitacionSeleccionada = { id: room.id, nombre: room.nombre, precio: parseFloat(room.precio), editingReservaId: reservaId };
+  document.getElementById('reservaHabitacionInfo').textContent = `${room.nombre} - ${room.tipo} - C$${room.precio} por noche (Editando)`;
+
+  let disabledDates = [];
+  try {
+    const res = await apiCall(`/reservas/fechas-no-disponibles/${room.id}/?exclude=${reservaId}`);
+    if (res && res.fechas) disabledDates = res.fechas;
+  } catch(e) { console.warn("Could not fetch dates", e); }
+
+  populateNacionalidades();
+  populatePaisesPasaporte();
+
+  // Pre-fill form
+  const setVal = (id, val) => { const el = document.getElementById(id); if (el && val) el.value = val; };
+  setVal('tipoDocumento', reserva.tipo_documento);
+  setVal('cedula', reserva.cedula);
+  setVal('paisPasaporte', reserva.pais_pasaporte);
+  setVal('pasaporte', reserva.pasaporte);
+  setVal('nombres', reserva.nombres);
+  setVal('apellidos', reserva.apellidos);
+  setVal('correo', getUsuarioActual()?.correo || '');
+  setVal('sexo', reserva.sexo);
+  setVal('fechaNacimiento', reserva.fecha_nacimiento);
+  setVal('nacionalidad', reserva.nacionalidad);
+  setVal('procedencia', reserva.procedencia);
+  setVal('numHuespedes', reserva.huespedes || reserva.num_huespedes || 1);
+
+  // Toggle document type fields
+  const isPasaporte = reserva.tipo_documento === 'pasaporte';
+  document.getElementById('containerCedula').style.display    = isPasaporte ? 'none'  : 'block';
+  document.getElementById('cedula').required                  = !isPasaporte;
+  document.getElementById('containerPasaporte').style.display = isPasaporte ? 'flex'  : 'none';
+  document.getElementById('paisPasaporte').required           = isPasaporte;
+  document.getElementById('pasaporte').required               = isPasaporte;
+
+  const actualizarTotal = () => {
+    const ingreso = document.getElementById('fechaIngreso').value;
+    const salida  = document.getElementById('fechaSalida').value;
+    if (ingreso && salida && habitacionSeleccionada) {
+      const dias = calcularDias(ingreso, salida);
+      document.getElementById('diasEstancia').value = dias > 0 ? dias : 0;
+      document.getElementById('totalPago').value    = dias > 0 ? `C$ ${(habitacionSeleccionada.precio * dias).toFixed(2)}` : '';
+    }
+  };
+
+  const fpIngreso = document.getElementById('fechaIngreso');
+  const fpSalida  = document.getElementById('fechaSalida');
+  if (fpIngreso._flatpickr) fpIngreso._flatpickr.destroy();
+  if (fpSalida._flatpickr)  fpSalida._flatpickr.destroy();
+
+  flatpickr(fpIngreso, {
+    minDate: "today", disable: disabledDates, dateFormat: "Y-m-d", locale: "es",
+    defaultDate: reserva.fechaIngreso,
+    onChange: actualizarTotal
+  });
+  flatpickr(fpSalida, {
+    minDate: "today", disable: disabledDates, dateFormat: "Y-m-d", locale: "es",
+    defaultDate: reserva.fechaSalida,
+    onChange: actualizarTotal
+  });
+
+  actualizarTotal();
+  mostrarPopup('reservaPopup');
+};
+
+// =================== CANCELAR RESERVA ===================
 window.cancelarReserva = async function(reservaId) {
   if (!confirm('¿Deseas cancelar esta reserva?')) return;
   
@@ -208,34 +401,42 @@ window.cancelarReserva = async function(reservaId) {
   renderRooms(currentFilter);
 };
 
-// =================== CREAR RESERVA (SQL SERVER) ===================
+// =================== CREAR / ACTUALIZAR RESERVA ===================
 async function crearReserva(reservaData) {
   const usuario = getUsuarioActual();
   if (!usuario) { showToast('Debes iniciar sesión para reservar.', 'warning'); return false; }
 
-  let usernameAuto = null;
+  const isEditing = habitacionSeleccionada?.editingReservaId;
+
   try {
-    const res = await apiCall('/reservas/crear/', {
-      method: 'POST',
-      body: JSON.stringify(reservaData)
-    });
-    showToast(res.message || 'Reserva creada exitosamente', 'success');
-    if (res.auto_registered) {
-        usernameAuto = res.username;
+    let res;
+    if (isEditing) {
+      // Actualizar reserva existente
+      res = await apiCall('/reservas/actualizar/', {
+        method: 'PUT',
+        body: JSON.stringify({
+          id_reserva: isEditing,
+          fechaIngreso: reservaData.fechaIngreso,
+          fechaSalida: reservaData.fechaSalida,
+          dias: reservaData.dias,
+          total: reservaData.total,
+          huespedes: reservaData.huespedes,
+          metodoPago: reservaData.metodoPago
+        })
+      });
+    } else {
+      // Crear nueva reserva
+      res = await apiCall('/reservas/crear/', {
+        method: 'POST',
+        body: JSON.stringify(reservaData)
+      });
     }
+    showToast(res.message || (isEditing ? 'Reserva actualizada' : 'Reserva creada exitosamente'), 'success');
     await syncDataFromBackend();
     await fetchHabitaciones();
   } catch (err) {
-    if (err.message.includes('servidor') || err.message.includes('fetch') || err.message.includes('Failed') || err.message.includes('Problemas')) {
-      console.warn('Backend inactivo, guardando reserva localmente.');
-      reservaData.id = Date.now();
-      reservaData.estado = 'Pendiente';
-      reservasLocales.push(reservaData);
-      showToast('Reserva guardada localmente (modo offline)', 'success');
-    } else {
-      showToast(err.message, 'error');
-      return false;
-    }
+    showToast(err.message, 'error');
+    return false;
   }
 
   const idText = reservaData.tipoDocumento === 'pasaporte'
@@ -293,13 +494,17 @@ function initChatbot() {
 document.addEventListener('DOMContentLoaded', async () => {
   initData();
   
-  // 📡 Conectar al backend y cargar habitaciones
+  // Conectar al backend y cargar habitaciones
   await initBackendConnection();
 
   renderRooms("all");
   setupFilters();
   actualizarHeaderUsuario();
   initChatbot();
+
+  // Populate nationalities on page load too
+  populateNacionalidades();
+  populatePaisesPasaporte();
 
   // Sincronización en background cada 60 segundos
   setInterval(async () => {
@@ -333,7 +538,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       cerrarPopup('loginPopup');
       document.getElementById('loginForm').reset();
       if (result === 'admin') {
-        // Redirigir al panel de administrador
         window.location.href = 'admin.html';
       } else {
         renderRooms("all");
@@ -378,36 +582,41 @@ document.addEventListener('DOMContentLoaded', async () => {
       e.target.value = formatted;
     });
 
-    // Auto-formato Pasaporte
+    // Auto-formato Pasaporte (validación por país)
     document.getElementById('pasaporte')?.addEventListener('input', (e) => {
       const pais = document.getElementById('paisPasaporte').value;
       let val = e.target.value.toUpperCase().replace(/[^0-9A-Z]/g, '');
       
+      // Formato por país con guiones automáticos
       if (pais === 'Panamá') {
-          if (val.length > 15) val = val.slice(0, 15);
-          let formatted = val;
-          if (val.length > 1) formatted = val.substring(0, 1) + '-' + val.substring(1);
-          if (val.length > 4) formatted = val.substring(0, 1) + '-' + val.substring(1, 4) + '-' + val.substring(4);
-          e.target.value = formatted;
-      } else if (pais === 'El Salvador' || pais === 'Guatemala' || pais === 'Honduras') {
-          // Generalmente son letras y numeros, pongamos un guion si es util, pero mejor mantener alfanumerico
-          // Sin guiones, solo alfanumerico hasta 13 chars
-          if (val.length > 13) val = val.slice(0, 13);
-          e.target.value = val;
+        if (val.length > 15) val = val.slice(0, 15);
+        let formatted = val;
+        if (val.length > 1) formatted = val.substring(0, 1) + '-' + val.substring(1);
+        if (val.length > 4) formatted = val.substring(0, 1) + '-' + val.substring(1, 4) + '-' + val.substring(4);
+        e.target.value = formatted;
+      } else if (pais === 'Nicaragua') {
+        // Formato: C00000000 (letra + 8 dígitos)
+        if (val.length > 9) val = val.slice(0, 9);
+        e.target.value = val;
       } else if (pais === 'Costa Rica') {
-          // 9 digitos usualmente, sin guiones
-          if (val.length > 9) val = val.slice(0, 9);
-          e.target.value = val;
+        if (val.length > 9) val = val.slice(0, 9);
+        e.target.value = val;
+      } else if (pais === 'Estados Unidos') {
+        // US passport: 9 digits
+        val = val.replace(/[^0-9]/g, '');
+        if (val.length > 9) val = val.slice(0, 9);
+        e.target.value = val;
       } else {
-          // Formato generico alfanumerico
-          if (val.length > 15) val = val.slice(0, 15);
-          e.target.value = val;
+        // Generic alphanumeric, max 15 chars
+        if (val.length > 15) val = val.slice(0, 15);
+        e.target.value = val;
       }
     });
 
     reservaForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!habitacionSeleccionada) { showToast('Selecciona una habitación primero.', 'warning'); return; }
+      if (!getUsuarioActual()) { showToast('Debes iniciar sesión para reservar.', 'warning'); mostrarPopup('loginPopup'); return; }
 
       const tipoDoc = document.getElementById('tipoDocumento').value;
       const camposBase = ['nombres','apellidos','sexo','fechaNacimiento','nacionalidad',
@@ -425,8 +634,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (tipoDoc === 'pasaporte') {
         const pais      = document.getElementById('paisPasaporte').value;
         const pasaporte = document.getElementById('pasaporte').value.trim().toUpperCase();
-        if (pasaporte.length < 5) {
-            showToast(`El pasaporte de ${pais} debe tener al menos 5 caracteres.`, 'error'); return;
+        if (pasaporte.replace(/[^A-Z0-9]/g, '').length < 5) {
+            showToast(`El pasaporte debe tener al menos 5 caracteres alfanuméricos.`, 'error'); return;
         }
       } else {
         const cedula = document.getElementById('cedula').value.trim();
@@ -441,7 +650,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       );
       if (dias <= 0) { showToast('La fecha de salida debe ser posterior a la entrada.', 'error'); return; }
 
+      const usuario = getUsuarioActual();
       const reservaData = {
+        usuarioId:       usuario.id,
         habitacionId:    habitacionSeleccionada.id,
         habitacionNombre:habitacionSeleccionada.nombre,
         precioPorNoche:  habitacionSeleccionada.precio,
@@ -460,6 +671,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         fechaSalida:     document.getElementById('fechaSalida').value,
         dias,
         huespedes:       parseInt(document.getElementById('numHuespedes').value),
+        numHuespedes:    parseInt(document.getElementById('numHuespedes').value),
         metodoPago:      document.getElementById('metodoPago').value,
         total:           habitacionSeleccionada.precio * dias
       };
@@ -530,13 +742,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     actualizarHeaderUsuario();
     renderRooms("all");
   });
-  // Enlace admin → redirige a la página de administrador
+  // Enlace admin
   document.getElementById('adminNavLink')?.addEventListener('click', (e) => {
     e.preventDefault();
     window.location.href = 'admin.html';
   });
 
-  // ── Sorteo / Lead Capture (SQL SERVER DIRECTO) ─────────────────────────────
+  // ── Sorteo / Lead Capture ─────────────────────────────
   const sorteoForm = document.getElementById('sorteoForm');
   if (sorteoForm) {
     sorteoForm.addEventListener('submit', async (e) => {
@@ -553,11 +765,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       const leadData = { nombres, apellidos, email, telefono, departamento, sexo, edad: parseInt(edad) || 0, ocupacion };
 
       try {
-        const res = await apiCall('/sorteos/', {
+        const res = await apiCall('/sorteos/crear/', {
           method: 'POST',
+          noAuth: true,
           body: JSON.stringify(leadData)
         });
-        showToast(res.message, 'success');
+        showToast(res.message || '¡Te has registrado exitosamente!', 'success');
         sorteoForm.reset();
       } catch (err) {
         showToast(err.message, 'error');

@@ -1526,3 +1526,65 @@ body.popup-open {
   transition: var(--transition);
 }
 .adm-btn-blue:hover { background: #004494; }
+
+/* MARKETING SORTEO PREMIUM STYLES */
+.sorteo-premium {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364) !important;
+  color: white !important;
+  border: 1px solid rgba(255, 215, 0, 0.3) !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important;
+}
+
+.sorteo-confetti {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: url('data:image/svg+xml;utf8,<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><g fill="%23FFD700" opacity="0.1"><circle cx="10%" cy="20%" r="5"/><rect x="20%" y="10%" width="10" height="10" transform="rotate(45 20% 10%)"/><circle cx="80%" cy="30%" r="8"/><rect x="90%" y="50%" width="15" height="15" transform="rotate(15 90% 50%)"/><circle cx="70%" cy="80%" r="6"/><rect x="30%" y="70%" width="12" height="12" transform="rotate(30 30% 70%)"/></g></svg>');
+  pointer-events: none;
+  z-index: 0;
+}
+
+.sorteo-premium .marketing-text {
+  position: relative;
+  z-index: 1;
+}
+
+.sorteo-badge {
+  display: inline-block;
+  background: #FFD700;
+  color: #0f2027;
+  padding: 0.4rem 1rem;
+  border-radius: 50px;
+  font-weight: 800;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 10px rgba(255, 215, 0, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.sorteo-features {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.sorteo-features span {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 768px) {
+  .sorteo-features {
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
+}

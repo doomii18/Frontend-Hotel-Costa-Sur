@@ -1,10 +1,10 @@
 // ================================================================
 //  data.js  — Capa de datos compartida entre usuario y admin
-//  Hotel Costa Sur - Integración con Backend (PostgreSQL/SQL Server)
+//  Hotel Costa Sur - Integración con Backend (PostgreSQL)
 // ================================================================
 
 // =================== DATOS DE HABITACIONES ===================
-let habitaciones = []; // Se cargará obligatoriamente desde SQL Server
+let habitaciones = []; // Se cargará desde el backend
 
 // =================== CONFIGURACIÓN DE CONEXIÓN BACKEND ===================
 const API_URL = 'https://backend-hotelcostasur-production.up.railway.app/api';
@@ -26,13 +26,13 @@ async function apiCall(endpoint, options = {}, retries = 2) {
     ...(options.headers || {})
   };
   
-  if (token) {
+  if (token && !options.noAuth) {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
 
     const response = await fetch(`${API_URL}${endpoint}`, {
       ...options,
@@ -96,7 +96,6 @@ async function initBackendConnection() {
 }
 
 // Sincroniza reservas y usuarios desde la BD real
-// noLogout=true: si hay un 401 de fondo, NO cerramos la sesión del usuario
 async function syncDataFromBackend() {
   try {
     // Admin usa listar-todos para ver todas las reservas, usuario solo las suyas
@@ -208,7 +207,7 @@ function getReservas() {
   return reservasLocales;
 }
 
-// =================== WORKFLOWS DE AUTENTICACIÓN (SQL SERVER DIRECTO) ===================
+// =================== WORKFLOWS DE AUTENTICACIÓN ===================
 
 async function registrarUsuario(datos) {
   if (!datos.nombre || !datos.email || !datos.password) {
@@ -241,27 +240,25 @@ async function loginUsuario(nombre, password) {
   }
 
   try {
-    // IMPORTANTE: Limpiar token viejo ANTES de llamar al login
-    // Si hay un token expirado en localStorage, el backend lo rechazaría con 401
-    // antes de siquiera leer usuario/contraseña
+    // Limpiar token viejo ANTES de llamar al login
     localStorage.removeItem('token');
 
     const res = await apiCall('/usuarios/login/', {
       method: 'POST',
-      noLogout: true,  // Nunca cerrar sesión por fallo en el login
+      noLogout: true,
+      noAuth: true,
       body: JSON.stringify({ nombre, password })
     });
     
     localStorage.setItem('token', res.token);
     setUsuarioActual(res.user);
     
-    // Sincronizar en segundo plano SIN esperar (fire-and-forget)
+    // Sincronizar en segundo plano
     syncDataFromBackend();
     
     showToast(`¡Bienvenido, ${res.user.nombre}!`, 'success');
     return res.user.rol === 'admin' ? 'admin' : true;
   } catch (err) {
-    // Mostrar el mensaje real del servidor si hay error de credenciales
     const msg = err.message.includes('expirada') ? 'Usuario o contraseña incorrectos.' : err.message;
     showToast(msg, 'error');
     return false;
@@ -280,8 +277,7 @@ function logoutUsuario(silent = false) {
 
 // =================== DISPONIBILIDAD Y CÁLCULOS ===================
 function reconciliarDisponibilidad() {
-  // En este modo, la disponibilidad la gestiona directamente el servidor SQL Server.
-  // Solo la reflejamos en el frontend de acuerdo al estado cargado.
+  // La disponibilidad la gestiona directamente el servidor.
 }
 
 function calcularDias(fechaIngreso, fechaSalida) {

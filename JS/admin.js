@@ -182,8 +182,8 @@ window.switchAdminTab = function(tab, btn) {
 // =================== HELPERS DE TABLA ===================
 function buildReservasTable(reservas) {
   if (!reservas.length) return '<p class="adm-empty">No hay reservas registradas.</p>';
-  const estLabel = e => e === 'activo' ? '🔑 Activo' : e === 'completado' ? '✅ Completado' : '📅 Pendiente';
-  const estCol   = e => e === 'activo' ? '#2196F3' : e === 'completado' ? '#00C853' : '#FF9800';
+  const estLabel = e => e === 'activo' ? '🔑 Activo' : e === 'completado' ? '✅ Completado' : e === 'cancelado' ? '❌ Cancelado' : '📅 Pendiente';
+  const estCol   = e => e === 'activo' ? '#2196F3' : e === 'completado' ? '#00C853' : e === 'cancelado' ? '#D32F2F' : '#FF9800';
   return `
     <div class="adm-table-wrap">
       <table class="adm-table">
@@ -209,11 +209,12 @@ function buildReservasTable(reservas) {
               </span>
             </td>
             <td>
-              <button onclick="adminCheckIn(${r.id})" class="adm-btn adm-btn--primary" style="font-size:.78rem; margin-bottom:.3rem;">✅ Confirmar</button><br>
-              <button onclick="adminEliminarReserva(${r.id})"
-                class="adm-btn adm-btn--danger" style="font-size:.78rem;">
-                🗑 Eliminar
-              </button>
+              ${r.estado !== 'cancelado' && r.estado !== 'completado' ? `
+                <button onclick="adminCheckIn(${r.id})" class="adm-btn adm-btn--primary" style="font-size:.78rem; margin-bottom:.3rem;">✅ Confirmar</button><br>
+                <button onclick="adminEliminarReserva(${r.id})" class="adm-btn adm-btn--danger" style="font-size:.78rem;">
+                  ❌ Cancelar
+                </button>
+              ` : `<small style="color:#888;">Sin acciones</small>`}
             </td>
           </tr>`
         }).join('')}
@@ -340,7 +341,7 @@ window.adminCheckOut = async function(reservaId) {
 
 // =================== CRUD RESERVAS (SQL SERVER DIRECTO) ===================
 window.adminEliminarReserva = async function(reservaId) {
-  if (!confirm('¿Eliminar esta reserva definitivamente?')) return;
+  if (!confirm('¿Anular/cancelar esta reserva? Se liberarán la habitación y las fechas, pero el registro permanecerá en el historial de cancelaciones.')) return;
   
   try {
     const res = await apiCall(`/reservas/${reservaId}/`, { method: 'DELETE' });
@@ -371,6 +372,18 @@ window.adminEliminarUsuario = async function(userId) {
   switchAdminTab('usuarios', document.getElementById('tab-usuarios'));
 };
 
+window.setupAdminPassToggle = function(inputId, iconId) {
+  const input = document.getElementById(inputId);
+  const icon  = document.getElementById(iconId);
+  if (input && icon) {
+    icon.addEventListener('click', () => {
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      icon.className = isPassword ? 'far fa-eye-slash' : 'far fa-eye';
+    });
+  }
+};
+
 window.formNuevoUsuario = function() {
   document.getElementById('userForm')?.remove();
   const c = document.getElementById('adminTabContent');
@@ -380,20 +393,33 @@ window.formNuevoUsuario = function() {
       <div class="adm-form-grid">
         <input id="fnNombre" placeholder="Nombre de usuario" class="adm-input">
         <input id="fnEmail"  type="email" placeholder="Correo electrónico" class="adm-input">
-        <input id="fnPass"   type="password" placeholder="Contraseña (mín. 8 chars)" class="adm-input">
+        <div style="position: relative;">
+          <input id="fnPass" type="password" placeholder="Contraseña (mín. 8 chars)" class="adm-input" style="padding-right: 2.5rem;">
+          <i class="far fa-eye" id="toggleFnPass" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); cursor: pointer; color: #888;"></i>
+        </div>
+        <div style="position: relative;">
+          <input id="fnPassConfirm" type="password" placeholder="Confirmar contraseña" class="adm-input" style="padding-right: 2.5rem;">
+          <i class="far fa-eye" id="toggleFnPassConfirm" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); cursor: pointer; color: #888;"></i>
+        </div>
       </div>
       <div class="adm-form-actions">
         <button onclick="adminCrearUsuario()" class="adm-btn adm-btn--primary">Crear</button>
         <button onclick="document.getElementById('userForm').remove()" class="adm-btn adm-btn--ghost">Cancelar</button>
       </div>
     </div>`);
+
+  setupAdminPassToggle('fnPass', 'toggleFnPass');
+  setupAdminPassToggle('fnPassConfirm', 'toggleFnPassConfirm');
 };
 
 window.adminCrearUsuario = async function() {
   const nombre = document.getElementById('fnNombre')?.value.trim();
   const email  = document.getElementById('fnEmail')?.value.trim();
   const pass   = document.getElementById('fnPass')?.value;
-  if (!nombre || !email || !pass) { showToast('Completa todos los campos.', 'warning'); return; }
+  const passConfirm = document.getElementById('fnPassConfirm')?.value;
+  
+  if (!nombre || !email || !pass || !passConfirm) { showToast('Completa todos los campos.', 'warning'); return; }
+  if (pass !== passConfirm) { showToast('Las contraseñas no coinciden.', 'error'); return; }
   if (pass.length < 8) { showToast('Contraseña mínimo 8 caracteres.', 'error'); return; }
   
   try {
@@ -422,21 +448,36 @@ window.formEditarUsuario = function(userId) {
       <div class="adm-form-grid">
         <input id="feNombre" value="${u.nombre}" placeholder="Nombre" class="adm-input">
         <input id="feEmail"  value="${u.email}" type="email" placeholder="Email" class="adm-input">
-        <input id="fePass"   type="password" placeholder="Nueva contraseña (dejar vacío para no cambiar)" class="adm-input">
+        <div style="position: relative;">
+          <input id="fePass" type="password" placeholder="Nueva contraseña (dejar vacío)" class="adm-input" style="padding-right: 2.5rem;">
+          <i class="far fa-eye" id="toggleFePass" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); cursor: pointer; color: #888;"></i>
+        </div>
+        <div style="position: relative;">
+          <input id="fePassConfirm" type="password" placeholder="Confirmar nueva contraseña" class="adm-input" style="padding-right: 2.5rem;">
+          <i class="far fa-eye" id="toggleFePassConfirm" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); cursor: pointer; color: #888;"></i>
+        </div>
       </div>
       <div class="adm-form-actions">
         <button onclick="adminGuardarEdicion('${userId}')" class="adm-btn adm-btn--warning">Guardar</button>
         <button onclick="document.getElementById('userEditForm').remove()" class="adm-btn adm-btn--ghost">Cancelar</button>
       </div>
     </div>`);
+
+  setupAdminPassToggle('fePass', 'toggleFePass');
+  setupAdminPassToggle('fePassConfirm', 'toggleFePassConfirm');
 };
 
 window.adminGuardarEdicion = async function(userId) {
   const nombre = document.getElementById('feNombre')?.value.trim();
   const email  = document.getElementById('feEmail')?.value.trim();
   const pass   = document.getElementById('fePass')?.value;
+  const passConfirm = document.getElementById('fePassConfirm')?.value;
+  
   if (!nombre || !email) { showToast('Nombre y email son obligatorios.', 'warning'); return; }
-  if (pass && pass.length < 8) { showToast('Contraseña mínimo 8 caracteres.', 'error'); return; }
+  if (pass) {
+    if (pass !== passConfirm) { showToast('Las contraseñas no coinciden.', 'error'); return; }
+    if (pass.length < 8) { showToast('Contraseña mínimo 8 caracteres.', 'error'); return; }
+  }
   
   try {
     const res = await apiCall(`/usuarios/${userId}/`, {

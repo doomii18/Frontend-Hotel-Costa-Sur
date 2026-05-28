@@ -502,6 +502,35 @@ document.addEventListener('DOMContentLoaded', async () => {
   actualizarHeaderUsuario();
   initChatbot();
 
+  // Hamburger Menu Toggle
+  const menuToggleBtn = document.getElementById('menuToggleBtn');
+  const headerNav     = document.querySelector('.header__nav');
+  const headerUser    = document.querySelector('.header__user');
+  if (menuToggleBtn && headerNav && headerUser) {
+    menuToggleBtn.addEventListener('click', () => {
+      const isActive = headerNav.classList.toggle('active');
+      headerUser.classList.toggle('active', isActive);
+      
+      const icon = menuToggleBtn.querySelector('i');
+      if (icon) {
+        if (isActive) {
+          icon.className = 'fas fa-times';
+        } else {
+          icon.className = 'fas fa-bars';
+        }
+      }
+    });
+
+    headerNav.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        headerNav.classList.remove('active');
+        headerUser.classList.remove('active');
+        const icon = menuToggleBtn.querySelector('i');
+        if (icon) icon.className = 'fas fa-bars';
+      });
+    });
+  }
+
   // Populate nationalities on page load too
   populateNacionalidades();
   populatePaisesPasaporte();
@@ -514,15 +543,51 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }, 60000);
 
+  // Toggle password visibility in registration form
+  const setupPasswordToggle = (inputId, iconId) => {
+    const input = document.getElementById(inputId);
+    const icon  = document.getElementById(iconId);
+    if (input && icon) {
+      icon.addEventListener('click', () => {
+        const isPassword = input.type === 'password';
+        input.type = isPassword ? 'text' : 'password';
+        icon.className = isPassword ? 'far fa-eye-slash toggle-password-icon' : 'far fa-eye toggle-password-icon';
+      });
+    }
+  };
+  setupPasswordToggle('regPassword', 'toggleRegPassword');
+  setupPasswordToggle('regConfirmPassword', 'toggleRegConfirmPassword');
+
   // ── Registro ──────────────────────────────────────────
   document.getElementById('registroForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const nombre   = document.getElementById('regNombre').value.trim();
-    const email    = document.getElementById('regEmail').value.trim();
-    const password = document.getElementById('regPassword').value;
+    const nombre          = document.getElementById('regNombre').value.trim();
+    const email           = document.getElementById('regEmail').value.trim();
+    const password        = document.getElementById('regPassword').value;
+    const confirmPassword = document.getElementById('regConfirmPassword').value;
+
+    if (password !== confirmPassword) {
+      showToast('Las contraseñas no coinciden.', 'warning');
+      return;
+    }
+
+    if (password.length < 8) {
+      showToast('La contraseña debe tener al menos 8 caracteres.', 'warning');
+      return;
+    }
+
     if (await registrarUsuario({ nombre, email, password })) {
       cerrarPopup('registroPopup');
       document.getElementById('registroForm').reset();
+      
+      // Restaurar tipo y íconos de contraseña a oculto
+      document.getElementById('regPassword').type = 'password';
+      document.getElementById('regConfirmPassword').type = 'password';
+      const eye1 = document.getElementById('toggleRegPassword');
+      const eye2 = document.getElementById('toggleRegConfirmPassword');
+      if (eye1) eye1.className = 'far fa-eye toggle-password-icon';
+      if (eye2) eye2.className = 'far fa-eye toggle-password-icon';
+
       mostrarPopup('loginPopup');
     }
   });
@@ -693,7 +758,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     'closePopupBtn','cancelPopupBtn',
     'closeDetallePopupBtn','cerrarDetalleBtn',
     'closeMisReservasBtn',
-    'closeExitosaPopupBtn','btnAceptarExitosa'
+    'closeExitosaPopupBtn','btnAceptarExitosa',
+    'closeSorteoPromoPopupBtn','cancelSorteoPromoBtn'
   ];
   closeIds.forEach(id => {
     const btn = document.getElementById(id);
@@ -777,6 +843,34 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
   }
+
+  // ── Sorteo Promo Popup Logic (8 seconds timer) ──────────
+  setTimeout(() => {
+    const yaMostrado = sessionStorage.getItem('sorteoPromoMostrado');
+    if (!yaMostrado) {
+      mostrarPopup('sorteoPromoPopup');
+    }
+  }, 8000);
+
+  // Registrar estado de visualización para no molestar al usuario en la misma sesión
+  const registrarSorteoMostrado = () => {
+    sessionStorage.setItem('sorteoPromoMostrado', 'true');
+  };
+  document.getElementById('closeSorteoPromoPopupBtn')?.addEventListener('click', registrarSorteoMostrado);
+  document.getElementById('cancelSorteoPromoBtn')?.addEventListener('click', registrarSorteoMostrado);
+
+  document.getElementById('llenarSorteoFormBtn')?.addEventListener('click', () => {
+    cerrarPopup('sorteoPromoPopup');
+    registrarSorteoMostrado();
+    const target = document.getElementById('sorteoSection');
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
+      const firstInput = document.getElementById('sorteoNombres');
+      if (firstInput) {
+        setTimeout(() => firstInput.focus(), 800);
+      }
+    }
+  });
 
   // ── Scroll reveal ─────────────────────────────────────
   const observer = new IntersectionObserver((entries) => {

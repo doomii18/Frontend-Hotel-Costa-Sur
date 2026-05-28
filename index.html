@@ -29,6 +29,9 @@
     <div class="header__logo">
       <img src="IMG/LOGO.jpeg" alt="Hotel Costa Sur" class="header__logo-img">
     </div>
+    <button class="header__toggle" id="menuToggleBtn" aria-label="Abrir menú" style="display: none;">
+      <i class="fas fa-bars"></i>
+    </button>
     <nav class="header__nav">
       <a href="#descripcion">Hotel</a>
       <a href="#habitaciones">Habitaciones</a>
@@ -263,13 +266,13 @@
   </section>
 
   <!-- SECCIÓN MARKETING / SORTEO -->
-  <section class="section marketing-section" style="padding-bottom: 2rem;">
+  <section id="sorteoSection" class="section marketing-section" style="padding-bottom: 2rem;">
     <div class="marketing-banner sorteo-premium">
       <div class="sorteo-confetti"></div>
       <div class="marketing-text">
         <div class="sorteo-badge">🏆 OFERTA EXCLUSIVA</div>
         <h2>🎁 ¡Gana una noche <span style="color:#FFD700;">GRATIS</span>!</h2>
-        <p>Participa en nuestro <strong>sorteo mensual exclusivo</strong>. Solo déjanos tus datos y podrías ser el afortunado ganador de una noche completamente gratis en nuestro hotel.</p>
+        <p>Participa en nuestro <strong>sorteo mensual exclusivo</strong>. Registra tus datos y podrás ganar una estadía de una noche en la <strong>Habitación 8 (valorada en C$550.00 córdobas)</strong> completamente gratis.</p>
         <div class="sorteo-features">
           <span>✅ 100% Gratis</span>
           <span>🎯 Sorteo mensual</span>
@@ -277,6 +280,7 @@
         </div>
       </div>
       <form class="marketing-form" id="sorteoForm">
+        <img src="IMG/LOGO.jpeg" alt="Hotel Costa Sur Logo" style="max-height: 55px; width: auto; display: block; margin: 0 auto 1.5rem auto; border-radius: 4px; object-fit: contain;">
         <div class="marketing-form-grid">
           <input type="text" id="sorteoNombres" placeholder="Nombres" required>
           <input type="text" id="sorteoApellidos" placeholder="Apellidos" required>
@@ -397,7 +401,14 @@
       <form class="popup__form" id="registroForm">
         <input type="text" id="regNombre" placeholder="Usuario" required>
         <input type="email" id="regEmail" placeholder="Correo electrónico" required>
-        <input type="password" id="regPassword" placeholder="Contraseña" required>
+        <div class="password-input-wrapper" style="position: relative; width: 100%;">
+          <input type="password" id="regPassword" placeholder="Contraseña" required style="width: 100%; padding-right: 2.5rem; margin-bottom: 0;">
+          <i class="far fa-eye toggle-password-icon" id="toggleRegPassword" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); cursor: pointer; color: #888; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; height: 100%;"></i>
+        </div>
+        <div class="password-input-wrapper" style="position: relative; width: 100%; margin-top: 1rem;">
+          <input type="password" id="regConfirmPassword" placeholder="Confirmar contraseña" required style="width: 100%; padding-right: 2.5rem; margin-bottom: 0;">
+          <i class="far fa-eye toggle-password-icon" id="toggleRegConfirmPassword" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); cursor: pointer; color: #888; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; height: 100%;"></i>
+        </div>
         <div class="popup__buttons">
           <button type="button" class="popup__btn popup__btn--cerrar" id="cancelRegistroBtn">Cancelar</button>
           <button type="submit" class="popup__btn popup__btn--reservar">Registrarse →</button>
@@ -423,6 +434,23 @@
       </form>
       <p style="margin-top: 1rem; font-size: 0.8rem;">¿No tienes cuenta? <a href="#" id="irRegistroLink">Regístrate
           aquí</a></p>
+    </div>
+  </div>
+
+  <!-- POPUP SORTEO PROMO (8 SEGUNDOS) -->
+  <div class="popup" id="sorteoPromoPopup">
+    <div class="popup__content" style="max-width: 500px; text-align: center;">
+      <div class="close-icon" id="closeSorteoPromoPopupBtn">&times;</div>
+      <img src="IMG/LOGO.jpeg" alt="Hotel Costa Sur Logo" style="max-height: 55px; width: auto; display: block; margin: 0 auto 1rem auto; border-radius: 4px; object-fit: contain;">
+      <div class="sorteo-badge" style="background: #E8B86B; color: #0F2B3D; display: inline-block; padding: 0.4rem 1.2rem; border-radius: 50px; font-weight: 800; font-size: 0.85rem; margin-bottom: 1rem; box-shadow: 0 4px 10px rgba(232, 184, 107, 0.2);">🎁 SORTEO EXCLUSIVO</div>
+      <h3 class="popup__title" style="margin-bottom: 0.8rem;">¡Gana una Noche Gratis!</h3>
+      <p style="font-size: 0.95rem; color: var(--texto-oscuro); margin-bottom: 1.5rem; line-height: 1.6;">
+        Participa en nuestro sorteo mensual para ganar una estadía gratuita en la <strong>Habitación 8 (valorada en C$550.00 córdobas)</strong>. ¡Es 100% gratuito!
+      </p>
+      <div class="popup__buttons">
+        <button type="button" class="popup__btn popup__btn--cerrar" id="cancelSorteoPromoBtn">Cancelar</button>
+        <button type="button" class="popup__btn popup__btn--reservar" id="llenarSorteoFormBtn">Llenar Formulario</button>
+      </div>
     </div>
   </div>
 

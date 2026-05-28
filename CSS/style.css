@@ -58,6 +58,25 @@ body.popup-open {
 
 .header__logo {
   margin-left: 5rem;
+  transition: var(--transition);
+}
+
+.header__toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--azul-profundo);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: var(--transition);
+  outline: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.header__toggle:hover {
+  color: var(--amarillo-miel);
 }
 
 .header__logo h1 {
@@ -643,24 +662,25 @@ body.popup-open {
 }
 
 .room-card__subtitle {
-  font-size: 0.9rem;
-  color: var(--gris-texto);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--azul-claro);
   margin-bottom: 1rem;
 }
 
 .room-card__features {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.6rem;
   margin-bottom: 1.5rem;
 }
 
 .feature-tag {
   background: #f4f5f7;
-  padding: 0.3rem 0.8rem;
+  padding: 0.4rem 1rem;
   border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-size: 0.92rem;
+  font-weight: 600;
   color: var(--texto-oscuro);
   display: inline-flex;
   align-items: center;
@@ -1015,8 +1035,9 @@ body.popup-open {
 
 .popup__content {
   background: var(--blanco-puro);
-  border-radius: 32px;
-  padding: 2rem;
+  border-radius: 8px;
+  border-top: 6px solid var(--azul-profundo);
+  padding: 2.2rem 2rem 2rem 2rem;
   max-width: 90%;
   width: 750px;
   max-height: 90vh;
@@ -1084,17 +1105,19 @@ body.popup-open {
   width: 100%;
   padding: 0.9rem 1rem;
   border: 1px solid var(--gris-claro);
-  border-radius: 60px;
+  border-radius: 6px;
   font-size: 0.95rem;
   transition: var(--transition);
   font-family: inherit;
+  background: #fdfdfd;
 }
 
 .popup__form input:focus,
 .popup__form select:focus {
   outline: none;
-  border-color: var(--amarillo-miel);
-  box-shadow: 0 0 0 3px rgba(232, 184, 107, 0.2);
+  border-color: var(--azul-claro);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(44, 95, 138, 0.15);
 }
 
 .form-row {
@@ -1125,7 +1148,7 @@ body.popup-open {
 .popup__btn {
   flex: 1;
   padding: 0.8rem;
-  border-radius: 50px;
+  border-radius: 6px;
   border: none;
   font-weight: 600;
   cursor: pointer;
@@ -1255,27 +1278,63 @@ body.popup-open {
 }
 
 /* RESPONSIVE */
-@media (max-width: 768px) {
+@media (max-width: 992px) {
   .header {
-    flex-direction: column;
-    padding: 1rem;
-    gap: 1rem;
-    text-align: center;
+    padding: 0.8rem 1.5rem;
+    justify-content: space-between;
+    flex-wrap: wrap;
   }
   .header__logo {
-    margin-left: 0;
-    margin-bottom: 0.5rem;
+    margin-left: 0 !important;
+  }
+  .header__logo-img {
+    max-height: 42px;
+  }
+  .header__toggle {
+    display: flex !important;
   }
   .header__nav {
-    justify-content: center;
-    gap: 0.8rem 1.2rem;
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    gap: 1.2rem;
+    padding: 1.2rem 0;
+    border-top: 1px solid var(--gris-claro);
+    margin-top: 0.8rem;
+  }
+  .header__nav.active {
+    display: flex;
   }
   .header__nav a {
-    font-size: 0.8rem;
+    font-size: 0.95rem;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid rgba(0,0,0,0.03);
   }
   .header__user {
+    display: none;
+    width: 100%;
     margin-top: 0.5rem;
+    padding: 1rem 0;
+    box-shadow: none;
+    border-radius: 0;
+    border-top: 1px solid var(--gris-claro);
+    background: transparent;
+    justify-content: center;
+    flex-direction: column;
+    gap: 0.8rem;
+    text-align: center;
   }
+  .header__user.active {
+    display: flex;
+  }
+  .logout-btn {
+    width: 100%;
+    max-width: 200px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
   .hero {
     min-height: auto;
     padding: 6rem 1.2rem 3rem 1.2rem;
@@ -1426,7 +1485,7 @@ body.popup-open {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   padding: 3rem;
-  border-radius: 20px;
+  border-radius: 8px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.2);
   position: relative;
   z-index: 2;
@@ -1442,7 +1501,7 @@ body.popup-open {
 .marketing-form input,
 .marketing-select {
   padding: 1rem 1.2rem;
-  border-radius: 10px;
+  border-radius: 6px;
   border: 1px solid #d9e2ec;
   font-family: inherit;
   font-size: 0.95rem;
@@ -1463,7 +1522,7 @@ body.popup-open {
   color: #002244;
   border: none;
   padding: 1.2rem;
-  border-radius: 10px;
+  border-radius: 6px;
   font-size: 1.1rem;
   font-weight: 800;
   cursor: pointer;

@@ -1258,14 +1258,69 @@ body.popup-open {
 @media (max-width: 768px) {
   .header {
     flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
     text-align: center;
   }
-  .hero__content h2 {
-    font-size: 2rem;
+  .header__logo {
+    margin-left: 0;
+    margin-bottom: 0.5rem;
   }
-  .stats-cards {
-    margin-top: -1rem;
+  .header__nav {
+    justify-content: center;
+    gap: 0.8rem 1.2rem;
+  }
+  .header__nav a {
+    font-size: 0.8rem;
+  }
+  .header__user {
+    margin-top: 0.5rem;
+  }
+  .hero {
+    min-height: auto;
+    padding: 6rem 1.2rem 3rem 1.2rem;
+    text-align: center;
+  }
+  .hero__container {
+    flex-direction: column;
+    gap: 2rem;
+    text-align: center;
+  }
+  .hero__content-left {
+    text-align: center;
+    max-width: 100%;
+    min-width: unset;
+  }
+  .hero__content-left h2 {
+    font-size: 2.2rem;
+    margin-bottom: 1rem;
+  }
+  .hero__subtitle {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    max-width: 100%;
+  }
+  .hero__buttons {
+    justify-content: center;
     gap: 1rem;
+  }
+  .hero__content-right {
+    justify-content: center;
+    width: 100%;
+  }
+  .hero-stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    max-width: 100%;
+  }
+  .hero-stat-card {
+    padding: 1.2rem 1rem;
+  }
+  .hero-stat-card .stat-number {
+    font-size: 1.8rem;
+  }
+  .hero-stat-card .stat-label {
+    font-size: 0.85rem;
   }
   .section {
     padding: 3rem 1.2rem;

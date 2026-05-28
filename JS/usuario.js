@@ -469,8 +469,8 @@ function initChatbot() {
   const messagesDiv = document.getElementById('chatMessages');
 
   const respuestas = {
-    horarios:  "⏰ Check-in: desde las 2:00 PM. Check-out: antes de las 12:00 PM.",
-    precios:   "💰 Habitaciones económicas: C$350-500, familiares: C$550-900, con AA: C$1100 por noche.",
+    horarios:  "⏰ 24/7 - Siempre estamos disponibles y atendiendo a tu llegada",
+    precios:   "💰 Habitaciones económicas: C$450-500, familiares: C$550-900, con AA: C$1100 por noche.",
     servicios: "🍳 No incluimos desayuno, pero hay opciones cerca del hotel.",
     wifi:      "📶 Sí, WiFi gratuito en todas las áreas del hotel.",
     mascotas:  "🐾 Lo sentimos, no aceptamos mascotas.",
@@ -844,13 +844,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // ── Sorteo Promo Popup Logic (8 seconds timer) ──────────
+  // ── Sorteo Promo Popup Logic (4 seconds timer) ──────────
   setTimeout(() => {
     const yaMostrado = sessionStorage.getItem('sorteoPromoMostrado');
     if (!yaMostrado) {
       mostrarPopup('sorteoPromoPopup');
     }
-  }, 8000);
+  }, 4000);
 
   // Registrar estado de visualización para no molestar al usuario en la misma sesión
   const registrarSorteoMostrado = () => {

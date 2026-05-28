@@ -209,12 +209,17 @@ function buildReservasTable(reservas) {
               </span>
             </td>
             <td>
-              ${r.estado !== 'cancelado' && r.estado !== 'completado' ? `
-                <button onclick="adminCheckIn(${r.id})" class="adm-btn adm-btn--primary" style="font-size:.78rem; margin-bottom:.3rem;">✅ Confirmar</button><br>
-                <button onclick="adminEliminarReserva(${r.id})" class="adm-btn adm-btn--danger" style="font-size:.78rem;">
-                  ❌ Cancelar
-                </button>
-              ` : `<small style="color:#888;">Sin acciones</small>`}
+              <div style="display:flex; flex-direction:column; gap:0.4rem; align-items:stretch; min-width: 120px;">
+                ${r.estado === 'pendiente' || !r.estado ? `
+                  <button onclick="adminCheckIn(${r.id})" class="adm-btn adm-btn--primary" style="font-size:.78rem; width: 100%;">✅ Confirmar</button>
+                  <button onclick="adminEliminarReserva(${r.id})" class="adm-btn adm-btn--danger" style="font-size:.78rem; width: 100%;">❌ Cancelar</button>
+                ` : r.estado === 'activo' ? `
+                  <button disabled class="adm-btn" style="font-size:.78rem; background:#cbd5e1; color:#475569; cursor:not-allowed; width: 100%; box-shadow:none; transform:none;">✓ Confirmado</button>
+                  <button onclick="adminEliminarReserva(${r.id})" class="adm-btn adm-btn--danger" style="font-size:.78rem; width: 100%;">❌ Cancelar</button>
+                ` : `
+                  <small style="color:#64748b; text-align:center; font-weight:500; padding:0.5rem 0;">Sin acciones</small>
+                `}
+              </div>
             </td>
           </tr>`
         }).join('')}
@@ -229,20 +234,32 @@ function buildUsuariosTable(users) {
     <div class="adm-table-wrap">
       <table class="adm-table">
         <thead><tr>
-          <th>Usuario</th><th>Email</th><th>Fecha registro</th><th>Reservas</th><th>Acciones</th>
+          <th>Usuario</th><th>Email</th><th>Fecha registro</th><th>Reservas</th><th>Estado</th><th>Acciones</th>
         </tr></thead>
         <tbody>${users.map(u => {
           const numRes = getReservas().filter(r => String(r.usuarioId) === String(u.id)).length;
           const regDate = u.fechaRegistro ? new Date(u.fechaRegistro).toLocaleDateString('es-NI') : '—';
+          const isActivo = u.Estado !== false;
+          const estadoLabel = isActivo ? '🟢 Activo' : '🔴 Desactivado';
+          const estadoCol = isActivo ? '#00C853' : '#FF1744';
           return `
           <tr>
             <td><strong>${u.nombre}</strong></td>
             <td>${u.email}</td>
             <td style="font-size:.82rem;">${regDate}</td>
             <td style="text-align:center;">${numRes}</td>
+            <td>
+              <span class="adm-badge" style="background:${estadoCol}20; color:${estadoCol};">
+                ${estadoLabel}
+              </span>
+            </td>
             <td style="display:flex;gap:.4rem;flex-wrap:wrap;">
               <button onclick="formEditarUsuario('${u.id}')"  class="adm-btn adm-btn--primary" style="font-size:.78rem;">✏️ Editar</button>
-              <button onclick="adminEliminarUsuario('${u.id}')" class="adm-btn adm-btn--danger" style="font-size:.78rem;">🗑 Eliminar</button>
+              ${isActivo ? `
+                <button onclick="adminEliminarUsuario('${u.id}')" class="adm-btn adm-btn--danger" style="font-size:.78rem;">🗑 Desactivar</button>
+              ` : `
+                <button onclick="adminRestaurarUsuario('${u.id}')" class="adm-btn adm-btn--green" style="font-size:.78rem;">🔄 Activar</button>
+              `}
             </td>
           </tr>`;
         }).join('')}
@@ -358,10 +375,28 @@ window.adminEliminarReserva = async function(reservaId) {
 
 // =================== CRUD USUARIOS (SQL SERVER DIRECTO) ===================
 window.adminEliminarUsuario = async function(userId) {
-  if (!confirm('¿Eliminar este usuario? Sus reservas no se eliminarán.')) return;
+  if (!confirm('¿Desactivar este usuario? Sus reservas no se eliminarán.')) return;
   
   try {
     const res = await apiCall(`/usuarios/${userId}/`, { method: 'DELETE' });
+    showToast(res.message, 'success');
+    await syncDataFromBackend();
+  } catch (err) {
+    showToast(err.message, 'error');
+    return;
+  }
+  
+  switchAdminTab('usuarios', document.getElementById('tab-usuarios'));
+};
+
+window.adminRestaurarUsuario = async function(userId) {
+  if (!confirm('¿Activar/restaurar este usuario para que pueda volver a iniciar sesión?')) return;
+  
+  try {
+    const res = await apiCall('/usuarios/restaurar/', {
+      method: 'POST',
+      body: JSON.stringify({ id_usuario: userId })
+    });
     showToast(res.message, 'success');
     await syncDataFromBackend();
   } catch (err) {

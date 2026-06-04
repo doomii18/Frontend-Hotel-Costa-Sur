@@ -140,6 +140,38 @@ function renderRooms(filter = "all") {
   }).join('');
 }
 
+function configurarMaximoHuespedes(roomId) {
+  const maxHuespedesMap = {
+    1: 3, 2: 3, 21: 3,
+    19: 4, 20: 4
+  };
+  const maxHuespedes = maxHuespedesMap[roomId] || 2;
+  const inputHuespedes = document.getElementById('numHuespedes');
+  if (inputHuespedes) {
+    inputHuespedes.max = maxHuespedes;
+    inputHuespedes.setAttribute('max', maxHuespedes);
+    
+    // Al escribir, evitar letras y controlar límite
+    inputHuespedes.oninput = function() {
+      this.value = this.value.replace(/[^0-9]/g, ''); // Solo números
+      if (this.value !== '') {
+        let val = parseInt(this.value, 10);
+        if (val > maxHuespedes) {
+          this.value = maxHuespedes;
+          showToast(`El máximo de personas para esta habitación es ${maxHuespedes}`, 'warning');
+        }
+      }
+    };
+
+    // Al perder el foco, si está vacío o es menor a 1, ponemos 1
+    inputHuespedes.onblur = function() {
+      if (this.value === '' || parseInt(this.value, 10) < 1) {
+        this.value = 1;
+      }
+    };
+  }
+}
+
 window.seleccionarHabitacion = async function(id, nombre, precio) {
   // Verificar que el usuario esté logueado
   if (!getUsuarioActual()) {
@@ -150,6 +182,9 @@ window.seleccionarHabitacion = async function(id, nombre, precio) {
 
   habitacionSeleccionada = { id, nombre, precio };
   document.getElementById('reservaHabitacionInfo').textContent = `${nombre} - C$${precio} por noche`;
+  
+  configurarMaximoHuespedes(id);
+  document.getElementById('numHuespedes').value = 1;
   
   let disabledDates = [];
   try {
@@ -339,6 +374,8 @@ window.editarReserva = async function(reservaId) {
   setVal('fechaNacimiento', reserva.fecha_nacimiento);
   setVal('nacionalidad', reserva.nacionalidad);
   setVal('procedencia', reserva.procedencia);
+
+  configurarMaximoHuespedes(room.id);
   setVal('numHuespedes', reserva.huespedes || reserva.num_huespedes || 1);
 
   // Toggle document type fields

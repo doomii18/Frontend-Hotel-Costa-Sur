@@ -120,9 +120,7 @@ function renderRooms(filter = "all") {
     return `<div class="room-card" data-room-id="${room.id}">
       <div class="room-card__img-container">
         <img src="${img}" class="room-card__img">
-        ${room.disponible
-          ? '<div class="room-badge">✓ Disponible</div>'
-          : '<div class="room-badge" style="background:var(--gris-texto)">✗ Reservado</div>'}
+        <div class="room-badge">✓ Disponible</div>
       </div>
       <div class="room-card__content">
         <h3 class="room-card__title">${room.nombre}</h3>
@@ -133,9 +131,8 @@ function renderRooms(filter = "all") {
             <strong>C$${room.precio}</strong><span>/noche</span>
           </div>
           <button class="room-card__btn-new"
-            onclick="seleccionarHabitacion(${room.id}, '${room.nombre} - ${room.tipo}', ${room.precio})"
-            ${!room.disponible ? 'disabled' : ''}>
-            ${room.disponible ? 'Reservar' : 'No disponible'}
+            onclick="seleccionarHabitacion(${room.id}, '${room.nombre} - ${room.tipo}', ${room.precio})">
+            Reservar
           </button>
         </div>
       </div>
@@ -432,8 +429,10 @@ async function crearReserva(reservaData) {
       });
     }
     showToast(res.message || (isEditing ? 'Reserva actualizada' : 'Reserva creada exitosamente'), 'success');
-    await syncDataFromBackend();
-    await fetchHabitaciones();
+    
+    // Sincronizar en segundo plano sin bloquear la interfaz
+    syncDataFromBackend();
+    fetchHabitaciones();
   } catch (err) {
     showToast(err.message, 'error');
     return false;

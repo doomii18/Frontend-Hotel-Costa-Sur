@@ -428,7 +428,10 @@
       <p class="popup__subtitle">Ingresa tus credenciales</p>
       <form class="popup__form" id="loginForm">
         <input type="text" id="loginUsuario" placeholder="Nombre de usuario" required>
-        <input type="password" id="loginPassword" placeholder="Contraseña" required>
+        <div class="password-input-wrapper" style="position: relative; width: 100%;">
+          <input type="password" id="loginPassword" placeholder="Contraseña" required style="width: 100%; padding-right: 2.5rem; margin-bottom: 0;">
+          <i class="far fa-eye toggle-password-icon" id="toggleLoginPassword" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); cursor: pointer; color: #888; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; height: 100%;"></i>
+        </div>
         <div class="popup__buttons">
           <button type="button" class="popup__btn popup__btn--cerrar" id="cancelLoginBtn">Cancelar</button>
           <button type="submit" class="popup__btn popup__btn--reservar">Iniciar Sesión →</button>
@@ -586,8 +589,8 @@
   <!-- Capa de datos y lógica -->
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
-  <script src="JS/data.js?v=3"></script>
-  <script src="JS/usuario.js?v=3"></script>
+  <script src="JS/data.js?v=4"></script>
+  <script src="JS/usuario.js?v=4"></script>
 </body>
 
 </html>

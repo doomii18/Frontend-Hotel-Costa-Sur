@@ -593,6 +593,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
   setupPasswordToggle('regPassword', 'toggleRegPassword');
   setupPasswordToggle('regConfirmPassword', 'toggleRegConfirmPassword');
+  setupPasswordToggle('loginPassword', 'toggleLoginPassword');
 
   // ── Registro ──────────────────────────────────────────
   document.getElementById('registroForm')?.addEventListener('submit', async (e) => {

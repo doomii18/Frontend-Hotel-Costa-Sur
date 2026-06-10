@@ -18,12 +18,12 @@ function renderAdminPanel() {
 
   root.innerHTML = `
     <div class="adm-tabs" id="adminTabsBar">
-      <button class="adm-tab active"   id="tab-dashboard"    onclick="switchAdminTab('dashboard',   this)">📊 Dashboard</button>
+      <button class="adm-tab active"   id="tab-dashboard"    onclick="switchAdminTab('dashboard',   this)">📊 PaneL-Indicadores</button>
       <button class="adm-tab"          id="tab-habitaciones" onclick="switchAdminTab('habitaciones',this)">🏨 Habitaciones</button>
       <button class="adm-tab"          id="tab-reservas"     onclick="switchAdminTab('reservas',    this)">📋 Reservas</button>
       <button class="adm-tab"          id="tab-usuarios"     onclick="switchAdminTab('usuarios',    this)">👥 Usuarios</button>
       <button class="adm-tab"          id="tab-sorteos"      onclick="switchAdminTab('sorteos',     this)">🎁 Sorteos</button>
-      <button class="adm-tab"          id="tab-analytics"    onclick="switchAdminTab('analytics',   this)">📈 Analytics</button>
+      <button class="adm-tab"          id="tab-analytics"    onclick="switchAdminTab('analytics',   this)">📈 Dashboard Analytics</button>
     </div>
     <div id="adminTabContent" style="margin-top:1.5rem;"></div>`;
 

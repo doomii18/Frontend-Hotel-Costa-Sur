@@ -23,6 +23,7 @@ function renderAdminPanel() {
       <button class="adm-tab"          id="tab-reservas"     onclick="switchAdminTab('reservas',    this)">📋 Reservas</button>
       <button class="adm-tab"          id="tab-usuarios"     onclick="switchAdminTab('usuarios',    this)">👥 Usuarios</button>
       <button class="adm-tab"          id="tab-sorteos"      onclick="switchAdminTab('sorteos',     this)">🎁 Sorteos</button>
+      <button class="adm-tab"          id="tab-analytics"    onclick="switchAdminTab('analytics',   this)">📈 Analytics</button>
     </div>
     <div id="adminTabContent" style="margin-top:1.5rem;"></div>`;
 
@@ -176,6 +177,48 @@ window.switchAdminTab = function(tab, btn) {
       </div>
       <div id="sorteosTable"><p class="adm-empty">Cargando participantes...</p></div>`;
     cargarSorteos();
+
+  // ── ANALYTICS ─────────────────────────────────────────
+  } else if (tab === 'analytics') {
+    content.innerHTML = `
+      <div style="margin-bottom: 1.5rem;">
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; margin-bottom:1.2rem;">
+          <div>
+            <h2 style="margin:0; font-size:1.4rem; color:var(--texto-oscuro);">📈 Google Analytics — Hotel Costa Sur</h2>
+            <p style="margin:0.3rem 0 0; color:#64748b; font-size:0.9rem;">Datos en tiempo real conectados a Google Analytics via Looker Studio</p>
+          </div>
+          <div style="display:flex; gap:0.6rem; align-items:center;">
+            <span style="display:inline-flex; align-items:center; gap:0.4rem; background:#f0fdf4; color:#16a34a; border:1px solid #bbf7d0; border-radius:20px; padding:0.35rem 0.9rem; font-size:0.82rem; font-weight:600;">
+              <span style="width:7px;height:7px;border-radius:50%;background:#16a34a;display:inline-block;"></span> Conectado a GA4
+            </span>
+            <a href="https://datastudio.google.com/reporting/0ec0592b-3579-49ed-be94-fd6497d68eaf" target="_blank"
+               style="display:inline-flex;align-items:center;gap:0.4rem;background:#0F2B3D;color:white;border-radius:20px;padding:0.4rem 1rem;font-size:0.82rem;font-weight:600;text-decoration:none;transition:opacity .2s;"
+               onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+              🔗 Abrir en Looker Studio
+            </a>
+          </div>
+        </div>
+
+        <div style="background:white; border-radius:16px; box-shadow:0 4px 20px rgba(0,0,0,0.06); border:1px solid rgba(0,0,0,0.05); overflow:hidden;">
+          <div style="background:linear-gradient(135deg,#0F2B3D 0%,#2C5F8A 100%); padding:1rem 1.5rem; display:flex; align-items:center; gap:0.8rem;">
+            <img src="https://www.gstatic.com/analytics-suite/header/suite/v2/ic_analytics.svg" alt="GA" style="width:22px;height:22px;filter:brightness(10);" onerror="this.style.display='none'">
+            <span style="color:white; font-weight:600; font-size:0.95rem;">Reporte de tráfico y comportamiento</span>
+            <span style="color:rgba(255,255,255,0.6); font-size:0.8rem; margin-left:auto;">Actualizado automáticamente</span>
+          </div>
+          <div style="position:relative; width:100%; padding-top: 0;">
+            <iframe
+              src="https://datastudio.google.com/embed/reporting/0ec0592b-3579-49ed-be94-fd6497d68eaf/page/yqn0F"
+              style="width:100%; height:600px; border:none; display:block;"
+              allowfullscreen
+              sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox">
+            </iframe>
+          </div>
+        </div>
+
+        <p style="text-align:center; color:#94a3b8; font-size:0.78rem; margin-top:1rem;">
+          Los datos provienen directamente de <strong>Google Analytics (GA4)</strong> · Propiedad: Hotel Costa Sur
+        </p>
+      </div>`;
   }
 };
 

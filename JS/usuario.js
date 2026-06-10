@@ -106,6 +106,7 @@ function renderRooms(filter = "all") {
     const id = room.id;
     if ([1, 2, 4, 16].includes(id))               img = "IMG/habitaciones/Habitacion  1,2,4,16.jpeg";
     else if (id === 19)                            img = "IMG/habitaciones/Habitación 19.jpeg";
+    else if (id === 20)                            img = "IMG/habitaciones/Habitacion 20.jpeg";
     else if (id === 21)                            img = "IMG/habitaciones/Habitación 21 .jpeg";
     else if ([3, 5, 6, 15, 17, 18].includes(id))  img = "IMG/habitaciones/Habitación 3, 5, 6, 15, 17, 18.jpeg";
     else if ([7, 8, 22].includes(id))              img = "IMG/habitaciones/Habitación 7, 8, 22.jpeg";

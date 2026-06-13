@@ -297,10 +297,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <form class="marketing-form" id="sorteoForm">
         <img src="IMG/LOGO.jpg" alt="Hotel Costa Sur Logo" style="max-height: 80px; width: auto; display: block; margin: 0 auto 1.5rem auto; border-radius: 4px; object-fit: contain;">
         <div class="marketing-form-grid">
-          <input type="text" id="sorteoNombres" placeholder="Nombres" required>
-          <input type="text" id="sorteoApellidos" placeholder="Apellidos" required>
+          <input type="text" id="sorteoNombres" placeholder="Nombres" required pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" title="Solo se permiten letras y espacios">
+          <input type="text" id="sorteoApellidos" placeholder="Apellidos" required pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" title="Solo se permiten letras y espacios">
           <input type="email" id="sorteoEmail" placeholder="Correo electrónico" style="grid-column: 1 / -1;" required>
-          <input type="tel" id="sorteoTelefono" placeholder="Teléfono" required>
+          <input type="tel" id="sorteoTelefono" placeholder="Teléfono" required pattern="[0-9]+" title="Solo se permiten números">
           
           <select id="sorteoDepartamento" required class="marketing-select">
             <option value="">Departamento...</option>
@@ -331,7 +331,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           </select>
 
           <input type="number" id="sorteoEdad" placeholder="Edad" min="16" max="99" required>
-          <input type="text" id="sorteoOcupacion" placeholder="Ocupación / Profesión" required style="grid-column: 1 / -1;">
+          <input type="text" id="sorteoOcupacion" placeholder="Ocupación / Profesión" required pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" title="Solo se permiten letras y espacios" style="grid-column: 1 / -1;">
         </div>
         <button type="submit" class="marketing-btn">¡Participar ahora!</button>
       </form>

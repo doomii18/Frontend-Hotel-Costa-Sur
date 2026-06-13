@@ -1536,7 +1536,7 @@ body.popup-open {
   box-shadow: 0 8px 20px rgba(255, 152, 0, 0.4);
 }
 
-@media (max-width: 992px) {
+@media (max-width: 1150px) {
   .marketing-banner {
     flex-direction: column;
     padding: 2rem;

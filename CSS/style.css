@@ -1542,11 +1542,15 @@ body.popup-open {
     padding: 2rem;
     text-align: center;
   }
-  .marketing-form-grid {
-    grid-template-columns: 1fr;
-  }
   .marketing-form {
     padding: 2rem;
+    width: 100%;
+  }
+}
+
+@media (max-width: 650px) {
+  .marketing-form-grid {
+    grid-template-columns: 1fr;
   }
 }
 

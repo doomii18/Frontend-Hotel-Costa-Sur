@@ -300,7 +300,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <input type="text" id="sorteoNombres" placeholder="Nombres" required pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" title="Solo se permiten letras y espacios" oninput="this.value = this.value.replace(/[^A-Za-záéíóúÁÉÍÓÚñÑ\s]/g, '')">
           <input type="text" id="sorteoApellidos" placeholder="Apellidos" required pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" title="Solo se permiten letras y espacios" oninput="this.value = this.value.replace(/[^A-Za-záéíóúÁÉÍÓÚñÑ\s]/g, '')">
           <input type="email" id="sorteoEmail" placeholder="Correo electrónico" style="grid-column: 1 / -1;" required>
-          <input type="tel" id="sorteoTelefono" placeholder="Teléfono" required pattern="[0-9]+" title="Solo se permiten números" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+          <input type="tel" id="sorteoTelefono" placeholder="Teléfono" required pattern="[0-9]{8}" maxlength="8" title="Debe ingresar exactamente 8 números" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8)">
           
           <select id="sorteoDepartamento" required class="marketing-select">
             <option value="">Departamento...</option>
@@ -330,7 +330,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <option value="Otro">Otro</option>
           </select>
 
-          <input type="number" id="sorteoEdad" placeholder="Edad" min="16" max="99" required>
+          <input type="number" id="sorteoEdad" placeholder="Edad" min="16" max="99" required oninput="if(this.value.length > 2) this.value = this.value.slice(0,2);">
           <input type="text" id="sorteoOcupacion" placeholder="Ocupación / Profesión" required pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" title="Solo se permiten letras y espacios" style="grid-column: 1 / -1;" oninput="this.value = this.value.replace(/[^A-Za-záéíóúÁÉÍÓÚñÑ\s]/g, '')">
         </div>
         <button type="submit" class="marketing-btn">¡Participar ahora!</button>

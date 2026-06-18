@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
         // La URL de tu backend
-        const API_URL = 'https://hotel-costa-sur-production.up.railway.app/api/visitas/';
+        const API_URL = 'https://backend-hotelcostasur-production.up.railway.app/api/visitas/';
         
         // Registramos la visita siempre que se carga o recarga la página (POST)
         let response = await fetch(API_URL, {

@@ -9,23 +9,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         // La URL de tu backend
         const API_URL = 'https://hotel-costa-sur-production.up.railway.app/api/visitas/';
         
-        let response;
-        // Verificamos si es la primera vez que visita en esta sesión
-        if (!sessionStorage.getItem('visitaRegistrada')) {
-            // Registramos la visita (POST)
-            response = await fetch(API_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            if (response.ok) {
-                sessionStorage.setItem('visitaRegistrada', 'true');
+        // Registramos la visita siempre que se carga o recarga la página (POST)
+        let response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
             }
-        } else {
-            // Solo consultamos los datos (GET)
-            response = await fetch(API_URL);
-        }
+        });
 
         if (response && response.ok) {
             const data = await response.json();
